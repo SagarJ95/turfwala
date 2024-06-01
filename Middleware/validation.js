@@ -17,6 +17,12 @@ registerValidation = [
   check("password").not().isEmpty().withMessage("Please Enter the Passowrd"),
 ];
 
+loginVaidation = [
+  check("email").not().isEmpty().withMessage("Please Enter the Email id"),
+  check("password").not().isEmpty().withMessage("Please Enter the Password"),
+];
+
 module.exports = {
   registerValidation,
+  loginVaidation,
 };

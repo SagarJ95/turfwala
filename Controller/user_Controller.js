@@ -57,32 +57,38 @@ module.exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const checkEmailId = await db.query(
-      "select * from users where email = $1",
-      [email]
-    );
+    const errors = validationResult(req);
 
-    if (checkEmailId.rows.length == 0) {
-      res.status(403).json({
-        error: "Email Not register. Please First register",
-      });
+    if (!errors.isEmpty()) {
+      res.status(409).json({ errors: errors.array() });
     } else {
-      bcryptjs.compare(
-        password,
-        checkEmailId.rows[0].password,
-        async (err, hashPassword) => {
-          if (err) {
-            res.status(403).json({ error: err.message });
-          } else {
-            // Generate JWT Token
-            const AccessToken = jwt.generateToken(checkEmailId.rows[0].id);
-            res.status(200).json({
-              message: "User Login Successfully",
-              access_token: AccessToken,
-            });
-          }
-        }
+      const checkEmailId = await db.query(
+        "select * from users where email = $1",
+        [email]
       );
+
+      if (checkEmailId.rows.length == 0) {
+        res.status(403).json({
+          error: "Email Not register. Please First register",
+        });
+      } else {
+        bcryptjs.compare(
+          password,
+          checkEmailId.rows[0].password,
+          async (err, hashPassword) => {
+            if (err) {
+              res.status(403).json({ error: err.message });
+            } else {
+              // Generate JWT Token
+              const AccessToken = jwt.generateToken(checkEmailId.rows[0].id);
+              res.status(200).json({
+                message: "User Login Successfully",
+                access_token: AccessToken,
+              });
+            }
+          }
+        );
+      }
     }
   } catch (err) {
     res.status(500).json({
