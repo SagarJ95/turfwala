@@ -11,5 +11,7 @@ router.post("/login", loginVaidation, loginRegister.login);
 
 router.get("/get_near_by_turf", homeController.getnearbyturf);
 router.get("/getleastturf", homeController.getleastturf);
+router.get("/getTopturf", homeController.getTopTurf);
+router.post("/getTurfInfo", homeController.getTurfInfoDetails);
 
 module.exports = router;
