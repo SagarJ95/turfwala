@@ -1,5 +1,5 @@
 const db = require("../db/database");
-
+require("dotenv").config();
 /**** get near by turf ******/
 module.exports.getnearbyturf = async (req, res) => {
   try {
@@ -217,44 +217,98 @@ module.exports.getTurfInfoDetails = async (req, res) => {
         msg: "Turf Does Not Exists or Been Removed By Admin",
       });
     } else {
-      if (Turfs.amenities !== null || Turfs.amenities !== "") {
-        const amenitiesId = Turfs.amenities.split(",").map((id) => {
+      if (Turfs.rows[0].amenities !== null || Turfs.rows[0].amenities !== "") {
+        const amenitiesId = Turfs.rows[0].amenities.split(",").map((id) => {
           return id.trim();
         });
+
         const amenitiesQUery = `select * from amenities where id = ANY($1::int[])`;
-        Turfs.amenities = await db.query(amenitiesQUery, [amenitiesId]);
+        const AmentitesRecords = await db.query(amenitiesQUery, [amenitiesId]);
+
+        if (AmentitesRecords.rowCount > 0) {
+          Turfs.rows[0].amenities = AmentitesRecords.rows;
+        } else {
+          Turfs.rows[0].amenities = null;
+        }
       }
 
-      if (Turfs.sports !== null || Turfs.sports !== "") {
-        const sportsId = Turfs.sports.split(",").map((id) => {
+      if (Turfs.rows[0].sports !== null || Turfs.rows[0].sports !== "") {
+        const sportsId = Turfs.rows[0].sports.split(",").map((id) => {
           return id.trim();
         });
         const sportsQUery = `select * from sports where id = ANY($1::int[])`;
-        Turfs.sports = await db.query(sportsQUery, [sportsId]);
+        const sportsDetalis = await db.query(sportsQUery, [sportsId]);
+
+        if (sportsDetalis.rowCount > 0) {
+          Turfs.rows[0].sports = sportsDetalis.rows;
+        } else {
+          Turfs.rows[0].sports = null;
+        }
       }
 
-      if (Turfs.players !== null || Turfs.players !== "") {
-        Turfs.players = Turfs.players.split(",").map((id) => {
+      if (Turfs.rows[0].players !== null || Turfs.rows[0].players !== "") {
+        Turfs.rows[0].players = Turfs.rows[0].players.split(",").map((id) => {
           return id.trim();
         });
       } else {
-        Turfs.players = null;
+        Turfs.rows[0].players = null;
       }
 
       const turfmediaQuery = `select tm.media_path,mt.media_name from turf_media as tm
       left join media_types as mt on tm.media_type = mt.id where tm.turf_id = $1`;
-      const turfValue = [Turfs.id];
+      const turfValue = [Turfs.rows[0].id];
       const Turf_Media = await db.query(turfmediaQuery, turfValue);
 
       if (Turf_Media.rowCount > 0) {
-        Turfs.media = turf_media.rows;
+        Turfs.rows[0].media = Turf_Media.rows;
       } else {
-        Turfs.media = null;
+        Turfs.rows[0].media = null;
       }
 
-      res.status(200).json({ success: true, result: Turfs });
+      res.status(200).json({ success: true, result: Turfs.rows[0] });
     }
   } catch (err) {
     res.status(500).json({ success: false, msg: "Somthing wrong" });
   }
 };
+
+/** get Review Info */
+
+module.exports.getReviewDetails = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const checkTurf = await db.query("select * from turfs where id = $1", [id]);
+
+    if (checkTurf.rowCount == 0) {
+      res.status(403).json({
+        success: false,
+        msg: "Truf Doesn't exits. Please try another turf",
+      });
+    } else {
+      const storagePath = process.env.STORAGE_PATH;
+      const limit = 2;
+      const reviewQuery = `select r.id,r.user_id,r.turf_id,r.rating,r.comment,u.name,
+       COALESCE(NULLIF(CONCAT($1, '/', r.image_1), $1), '') AS image_1,
+        COALESCE(NULLIF(CONCAT($1, '/', r.image_2), $1), '') AS image_2,
+        COALESCE(NULLIF(CONCAT($1, '/', r.image_3), $1), '') AS image_3,
+        COALESCE(NULLIF(CONCAT($1, '/', r.image_4), $1), '') AS image_4,
+        COALESCE(NULLIF(CONCAT($1, '/', r.image_5), $1), '') AS image_5,
+        r.created_at from reviews as r left join users as u on r.user_id = u.id where r.turf_id = $2 limit $3`;
+      const reviewId = [storagePath, id, limit];
+      const getTurfReview = await db.query(reviewQuery, reviewId);
+      console.log("reviewId>>", reviewId);
+      if (getTurfReview.rowCount > 0) {
+        res.status(200).json({ success: true, result: getTurfReview.rows });
+      } else {
+        res.status(403).json({ success: false, result: [] });
+      }
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      msg: "Something Wrong",
+    });
+  }
+};
+
+/** store review */

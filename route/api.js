@@ -14,4 +14,7 @@ router.get("/getleastturf", homeController.getleastturf);
 router.get("/getTopturf", homeController.getTopTurf);
 router.post("/getTurfInfo", homeController.getTurfInfoDetails);
 
+//review
+router.post("/getReview", homeController.getReviewDetails);
+
 module.exports = router;
