@@ -1,5 +1,6 @@
 const db = require("../db/database");
 require("dotenv").config();
+
 /**** get near by turf ******/
 module.exports.getnearbyturf = async (req, res) => {
   try {
@@ -312,3 +313,47 @@ module.exports.getReviewDetails = async (req, res) => {
 };
 
 /** store review */
+module.exports.store_review = async (req, res) => {
+  try {
+    const { user_id, turf_id, rating, comments } = req.body;
+
+    const checkTurfDetails = await db.query(
+      "select * from turfs where id = $1",
+      [turf_id]
+    );
+
+    if (checkTurfDetails.rowCount == 0) {
+      res.status(403).json({ success: false, msg: "Turf doen't exists" });
+    } else {
+      const checkReviewCount = await db.query(
+        "select * from reviews where user_id = $1 and turf_id = $2",
+        [user_id, turf_id]
+      );
+
+      if (checkReviewCount.rowCount >= 1) {
+        res.status(400).json({
+          success: false,
+          msg: "Not eligible to add multiple review",
+        });
+      } else {
+        const StoreReviews = await db.query(
+          "Insert Into reviews(user_id,turf_id,rating,comment) VALUES ($1,$2,$3,$4) RETURNING *",
+          [user_id, turf_id, rating, comments]
+        );
+
+        const reviewId = StoreReviews.rows[0].id;
+        if (reviewId != "") {
+          res
+            .status(200)
+            .json({ success: true, msg: "Store Review Successfully" });
+        } else {
+          res
+            .status(201)
+            .json({ success: true, msg: "Store Review UnSuccessfully" });
+        }
+      }
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, msg: "Somthing Wrong" });
+  }
+};
