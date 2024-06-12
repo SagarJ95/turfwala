@@ -286,18 +286,17 @@ module.exports.getReviewDetails = async (req, res) => {
         msg: "Truf Doesn't exits. Please try another turf",
       });
     } else {
-      const storagePath = process.env.STORAGE_PATH;
       const limit = 2;
       const reviewQuery = `select r.id,r.user_id,r.turf_id,r.rating,r.comment,u.name,
-       COALESCE(NULLIF(CONCAT($1, '/', r.image_1), $1), '') AS image_1,
-        COALESCE(NULLIF(CONCAT($1, '/', r.image_2), $1), '') AS image_2,
-        COALESCE(NULLIF(CONCAT($1, '/', r.image_3), $1), '') AS image_3,
-        COALESCE(NULLIF(CONCAT($1, '/', r.image_4), $1), '') AS image_4,
-        COALESCE(NULLIF(CONCAT($1, '/', r.image_5), $1), '') AS image_5,
-        r.created_at from reviews as r left join users as u on r.user_id = u.id where r.turf_id = $2 limit $3`;
-      const reviewId = [storagePath, id, limit];
+       r.image_1,
+        r.image_2,
+        r.image_3,
+        r.image_4,
+        r.image_5,
+        r.created_at from reviews as r left join users as u on r.user_id = u.id where r.turf_id = $1 limit $2`;
+      const reviewId = [id, limit];
       const getTurfReview = await db.query(reviewQuery, reviewId);
-      console.log("reviewId>>", reviewId);
+
       if (getTurfReview.rowCount > 0) {
         res.status(200).json({ success: true, result: getTurfReview.rows });
       } else {
@@ -322,6 +321,13 @@ module.exports.store_review = async (req, res) => {
       [turf_id]
     );
 
+    //upload file get into array
+    var images = req.files;
+    var imagesArray = [];
+    for (var i = 0; i < images.length; i++) {
+      imagesArray.push(images[i].filename);
+    }
+
     if (checkTurfDetails.rowCount == 0) {
       res.status(403).json({ success: false, msg: "Turf doen't exists" });
     } else {
@@ -336,9 +342,25 @@ module.exports.store_review = async (req, res) => {
           msg: "Not eligible to add multiple review",
         });
       } else {
+        var image_1 = imagesArray && imagesArray[0] ? imagesArray[0] : "";
+        var image_2 = imagesArray && imagesArray[1] ? imagesArray[1] : "";
+        var image_3 = imagesArray && imagesArray[2] ? imagesArray[2] : "";
+        var image_4 = imagesArray && imagesArray[3] ? imagesArray[3] : "";
+        var image_5 = imagesArray && imagesArray[4] ? imagesArray[4] : "";
+        console.log("image_3", image_3);
         const StoreReviews = await db.query(
-          "Insert Into reviews(user_id,turf_id,rating,comment) VALUES ($1,$2,$3,$4) RETURNING *",
-          [user_id, turf_id, rating, comments]
+          "Insert Into reviews(user_id,turf_id,rating,comment,image_1,image_2,image_3,image_4,image_5) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *",
+          [
+            user_id,
+            turf_id,
+            rating,
+            comments,
+            image_1,
+            image_2,
+            image_3,
+            image_4,
+            image_5,
+          ]
         );
 
         const reviewId = StoreReviews.rows[0].id;

@@ -6,7 +6,18 @@ const {
   loginVaidation,
 } = require("../Middleware/validation");
 const multer = require("multer");
-const upload = multer({ dest: __dirname + "/storage/Review" });
+const upload = multer();
+
+const uploadMultipleFile = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, "storage/Review");
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.fieldname + "-" + Date.now() + ".jpg");
+    },
+  }),
+}).array("images", 3);
 
 const uploadFile = router.post(
   "/register",
@@ -22,6 +33,7 @@ router.post("/getTurfInfo", homeController.getTurfInfoDetails);
 
 //review
 router.post("/getReview", homeController.getReviewDetails);
-router.post("/storereview", upload.none(), homeController.store_review);
+router.post("/storereview", uploadMultipleFile, homeController.store_review);
+//router.post("/storereview", upload.none(), homeController.store_review);
 
 module.exports = router;
