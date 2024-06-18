@@ -26,6 +26,7 @@ const uploadFile = router.post(
 );
 router.post("/login", loginVaidation, loginRegister.login);
 
+router.post("/get_turfs", homeController.getturfs);
 router.get("/get_near_by_turf", homeController.getnearbyturf);
 router.get("/getleastturf", homeController.getleastturf);
 router.get("/getTopturf", homeController.getTopTurf);

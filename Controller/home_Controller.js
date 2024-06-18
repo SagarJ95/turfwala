@@ -1,6 +1,83 @@
 const db = require("../db/database");
 require("dotenv").config();
 
+/** get turfs based filter apply */
+module.exports.getturfs = async (req, res) => {
+  try {
+    const { sport_id, amenity_id, players, sizes, pages } = req.body;
+
+    let query = `Select t.id,t.turf_name,t.turf_no,t.amenities,t.sports,t.players,t.city,t,pincode,
+    COALESCE(rx.Averageratings,0) as AverageRating,COALESCE(rx.RatingCount, 0) as RatingCount  from turfs as t left join
+    (select r.turf_id, AVG(r.rating) AS Averageratings, COUNT(r.rating) AS RatingCount
+    from reviews r group by r.turf_id ) AS rx on rx.turf_id = t.id where deleted_at IS NULL`;
+
+    if (sport_id && sport_id.toString().length > 0) {
+      query += ` AND t.sports IN (${sport_id
+        .map((id) => `'${id}'`)
+        .join(",")})`;
+    }
+
+    if (amenity_id && amenity_id.toString().length > 0) {
+      query += ` AND t.amenities IN (${amenity_id
+        .map((id) => `'${id}'`)
+        .join(",")})`;
+    }
+
+    if (players && players.toString().length > 0) {
+      query += ` AND t.players IN (${players
+        .map((id) => `'${id}'`)
+        .join(",")})`;
+    }
+
+    if (sizes != "" && typeof sizes != "undefined") {
+      var size = sizes.split("-");
+      var minSize = size[0] ? size[0] : 0;
+      var maxSize = size[1] ? size[1] : 10000;
+
+      query += `where t.turf_size between ${minSize} and ${maxSize}`;
+    }
+
+    const limit = req.limit ? req.limit : 8;
+    const page = req.page ? req.page : 1;
+
+    if (pages > 1) {
+      const start = (req.page - 1) * limit;
+    } else {
+      const start = 0;
+    }
+
+    query += ` order by t.id desc`;
+
+    const turfs = await db.query(query, []);
+
+    if (turfs.rowCount > 0) {
+      const turfCount = turfs.rowCount;
+      const total_page = Math.ceil(turfCount / limit);
+
+      res.status(200).json({
+        code: 1,
+        msg: "Turfs Found",
+        data: turfs.rows,
+        total: turfs.rowCount,
+        total_pages: total_page,
+        next: total_page > page ? page + 1 : 0,
+        prev: page - 1,
+      });
+    } else {
+      res.status(404).json({
+        code: 3,
+        msg: "Turfs Not Found",
+        data: [],
+        total: turfs.rowCount,
+        total_pages: 0,
+        next: 0,
+        prev: 0,
+      });
+    }
+  } catch (e) {
+    res.status(500).json({ msg: e.message });
+  }
+};
 /**** get near by turf ******/
 module.exports.getnearbyturf = async (req, res) => {
   try {
