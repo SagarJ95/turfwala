@@ -1,5 +1,6 @@
 const db = require("../db/database");
 require("dotenv").config();
+const format = require("pg-format");
 
 /** get turfs based filter apply */
 module.exports.getturfs = async (req, res) => {
@@ -54,10 +55,34 @@ module.exports.getturfs = async (req, res) => {
       const turfCount = turfs.rowCount;
       const total_page = Math.ceil(turfCount / limit);
 
+      const turfsQuery = turfs.rows.map(async (element, index) => {
+        if (element.amenities !== null && element.amenities !== "") {
+          const amenitiesData = element.amenities.split(",").map(Number);
+          const amenitiesQuery = format(
+            "SELECT amenity_name, id FROM amenities WHERE id IN (%L)",
+            amenitiesData
+          );
+
+          const getAmenties = await db.query(amenitiesQuery);
+
+          if (getAmenties.rowCount > 0) {
+            element.amenities = getAmenties.rows;
+          } else {
+            element.amenities = null;
+          }
+        }
+
+        //element.amenities = element.amenities ? element.amenities : null;
+
+        return element;
+      });
+
+      const result = await Promise.all(turfsQuery);
+
       res.status(200).json({
         code: 1,
         msg: "Turfs Found",
-        data: turfs.rows,
+        data: result,
         total: turfs.rowCount,
         total_pages: total_page,
         next: total_page > page ? page + 1 : 0,
