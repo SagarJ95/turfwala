@@ -59,7 +59,7 @@ module.exports.getturfs = async (req, res) => {
         if (element.amenities !== null && element.amenities !== "") {
           const amenitiesData = element.amenities.split(",").map(Number);
           const amenitiesQuery = format(
-            "SELECT amenity_name, id FROM amenities WHERE id IN (%L)",
+            "SELECT amenity_name,front_icon id FROM amenities WHERE id IN (%L)",
             amenitiesData
           );
 
@@ -72,7 +72,40 @@ module.exports.getturfs = async (req, res) => {
           }
         }
 
-        //element.amenities = element.amenities ? element.amenities : null;
+        if (element.sports !== null && element.sports !== "") {
+          const sportData = element.sports.split(",").map(Number);
+          const sportQQuery = format(
+            "select sport_name,front_icon from sports where id IN (%L)",
+            sportData
+          );
+
+          const getSport = await db.query(sportQQuery);
+
+          if (getSport.rowCount > 0) {
+            element.sports = getSport.rows;
+          } else {
+            element.sports = null;
+          }
+        }
+
+        if (element.players !== null && element.players !== "") {
+          element.players = element.players.split(",").map((id) => {
+            return id.trim();
+          });
+        } else {
+          element.players = null;
+        }
+
+        const turfmediaquery = `select tm.media_path,mt.media_name from turf_media as tm
+        left join media_types as mt on tm.media_type = mt.id where tm.turf_id = $1`;
+        const turfvalue = [element.id];
+        const turf_media = await db.query(turfmediaquery, turfvalue);
+
+        if (turf_media.rowCount > 0) {
+          element.media = turf_media.rows;
+        } else {
+          element.media = null;
+        }
 
         return element;
       });

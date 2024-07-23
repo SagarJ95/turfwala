@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const loginRegister = require("../Controller/user_Controller");
 const homeController = require("../Controller/home_Controller");
+const GetController = require("../Controller/get_controller");
 const {
   registerValidation,
   loginVaidation,
@@ -35,6 +36,7 @@ router.post("/getTurfInfo", homeController.getTurfInfoDetails);
 //review
 router.post("/getReview", homeController.getReviewDetails);
 router.post("/storereview", uploadMultipleFile, homeController.store_review);
+router.post("/check_availability", GetController.check_availibality);
 //router.post("/storereview", upload.none(), homeController.store_review);
 
 module.exports = router;
