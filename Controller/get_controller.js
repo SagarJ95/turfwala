@@ -49,12 +49,12 @@ module.exports.check_availibality = async (req, res) => {
       start_today.setHours(parseInt(hours));
       start_today.setMinutes(parseInt(minutes));
       start_today.setSeconds(parseInt(seconds));
-      start_today.setMilliseconds(0); // Ensure milliseconds are set to zero
+      start_today.setMilliseconds(0);
 
       start_end.setHours(parseInt(endhours));
       start_end.setMinutes(parseInt(endminutes));
       start_end.setSeconds(parseInt(endseconds));
-      start_end.setMilliseconds(0); // Ensure milliseconds are set to zero
+      start_end.setMilliseconds(0);
 
       let start_time = start_today.toLocaleTimeString([], {
         hour: "numeric",
@@ -74,6 +74,7 @@ module.exports.check_availibality = async (req, res) => {
         display_time: `${start_date_time}-${end_date_time}`,
         price: getTurfTimeing.rows[i].price,
         discounted_price: getTurfTimeing.rows[i].discounted_price,
+        booked: false,
       };
 
       if (get_turf_bookings.rows.length != 0) {
@@ -83,9 +84,7 @@ module.exports.check_availibality = async (req, res) => {
               get_turf_bookings[j].start_time == start_time &&
               get_turf_bookings[j].end_time == end_time
             ) {
-              slots[i] = {
-                booked: true,
-              };
+              slots[i].booked = true;
             }
           }
         }
@@ -93,7 +92,6 @@ module.exports.check_availibality = async (req, res) => {
 
       if (user_id != "") {
         var getSlots = `select * from slot_cart where Date(booking_date) = '${dateFormat}' and user_id = ${user_id} and status = 1`;
-        console.log("getslots", getSlots);
         var get_slots = await db.query(getSlots, []);
 
         if (get_slots.rows.length != 0) {
@@ -102,23 +100,19 @@ module.exports.check_availibality = async (req, res) => {
               element.start_time == display_time &&
               element.end_time == display_endtime
             ) {
-              slots[i] = {
-                user_booked: true,
-                cart_id: element.id,
-              };
+              slots[i].user_booked = true;
+              slots[i].user_booked = element.id;
             }
           });
         } else {
-          slots[i] = {
-            user_booked: false,
-          };
+          slots[i].user_booked = false;
         }
       }
 
       start_time = null;
       end_time = null;
     }
-    console.log("getTurfTimeing>>", getTurfTimeing);
+
     if (get_turf_bookings.rows.length != 0) {
       res.status(200).json({
         code: 1,
@@ -138,8 +132,3 @@ module.exports.check_availibality = async (req, res) => {
     }
   }
 };
-
-function padZero(value) {
-  console.log("value>>", value);
-  return value.toString().padStart(2, "0");
-}
