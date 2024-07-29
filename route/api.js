@@ -1,7 +1,5 @@
 const router = require("express").Router();
-const loginRegister = require("../Controller/user_Controller");
-const homeController = require("../Controller/home_Controller");
-const GetController = require("../Controller/get_controller");
+const FrontApi = require("../Controller/Api_controller");
 const {
   registerValidation,
   loginVaidation,
@@ -25,18 +23,18 @@ const uploadFile = router.post(
   registerValidation,
   loginRegister.register
 );
-router.post("/login", loginVaidation, loginRegister.login);
 
-router.post("/get_turfs", homeController.getturfs);
-router.get("/get_near_by_turf", homeController.getnearbyturf);
-router.get("/getleastturf", homeController.getleastturf);
-router.get("/getTopturf", homeController.getTopTurf);
-router.post("/getTurfInfo", homeController.getTurfInfoDetails);
-
+//Front APi
+router.post("/login", loginVaidation, FrontApi.login);
+router.post("/get_turfs", FrontApi.getturfs);
+router.get("/get_near_by_turf", FrontApi.getnearbyturf);
+router.get("/getleastturf", FrontApi.getleastturf);
+router.get("/getTopturf", FrontApi.getTopTurf);
+router.post("/getTurfInfo", FrontApi.getTurfInfoDetails);
 //review
-router.post("/getReview", homeController.getReviewDetails);
-router.post("/storereview", uploadMultipleFile, homeController.store_review);
-router.post("/check_availability", GetController.check_availibality);
-//router.post("/storereview", upload.none(), homeController.store_review);
+router.post("/getReview", FrontApi.getReviewDetails);
+//router.post("/storereview", upload.none(), FrontApi.store_review);
+router.post("/storereview", uploadMultipleFile, FrontApi.store_review);
+router.post("/check_availability", FrontApi.check_availibality);
 
 module.exports = router;
