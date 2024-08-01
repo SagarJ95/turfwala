@@ -1,10 +1,10 @@
 const { check } = require("express-validator");
 
-adminlogin = [
-  check("email").not().isEmpty().withMessage("Please Enter the email id"),
-  check("password").not().isEmpty().withMessage("Please Enter the password"),
+saveTurf = [
+  check("turf_name").not().isEmpty().withMessage("Please Enter the Turf Name"),
+  check("turf_size").not().isEmpty().withMessage("Please Enter the Turf Size"),
 ];
 
 module.exports = {
-  adminlogin,
+  saveTurf,
 };
