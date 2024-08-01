@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const AdminApi = require("../Controller/Admin_apiController");
+const AdminApi = require("../Controller/AdminApiController");
 
 router.post("/save_turf", AdminApi.save_turf);
 
