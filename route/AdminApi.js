@@ -3,6 +3,7 @@ const AdminApi = require("../Controller/AdminApiController");
 const { saveTurf } = require("../Middleware/AdminValidation");
 const { uploadImage } = require("../Middleware/FileUpload");
 
-router.post("/save_turf", [saveTurf, uploadImage], AdminApi.save_turf);
+//saveTurf,
+router.post("/save_turf", [uploadImage, saveTurf], AdminApi.save_turf);
 
 module.exports = router;
