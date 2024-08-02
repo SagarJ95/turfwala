@@ -21,7 +21,7 @@ const uploadMultipleFile = multer({
 const uploadFile = router.post(
   "/register",
   registerValidation,
-  loginRegister.register
+  FrontApi.register
 );
 
 //Front APi
