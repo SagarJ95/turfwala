@@ -266,7 +266,7 @@ module.exports.update_turf = async (req, res) => {
             };
 
             const brandingImageId = await db.query(
-              "Insert into turf_media(media_path,media_type,turf_id) values ($1,$2,$3) RETURNING *",
+              "update turf_media SET media_path=$1,media_type=$2 Where turf_id=$3",
               [
                 brandingImageData.media_path,
                 brandingImageData.media_type,
@@ -293,7 +293,7 @@ module.exports.update_turf = async (req, res) => {
           }
 
           const interiorQuery = await db.query(
-            "insert into turf_media(media_path,media_type,turf_id) values($1,$2,$3)",
+            "update turf_media SET media_path=$1,media_type=$2 where turf_id = $3",
             [
               interiorData.media_path,
               interiorData.media_type,
@@ -318,7 +318,7 @@ module.exports.update_turf = async (req, res) => {
           }
 
           const pamphletId = await db.query(
-            "Insert Into turf_media(media_path,media_type,turf_id) Values($1,$2,$3)",
+            "update turf_media SET media_path=$1,media_type=$2 where turf_id = $3",
             [
               pamphletData.media_path,
               pamphletData.media_type,
@@ -328,7 +328,7 @@ module.exports.update_turf = async (req, res) => {
         }
       }
 
-      res.status(200).json({ message: "Turf saved successfully" });
+      res.status(200).json({ message: "Turf Updated successfully" });
     }
   } catch (e) {
     res.status(400).json({ error: e.message });
