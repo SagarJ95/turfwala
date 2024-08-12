@@ -749,6 +749,7 @@ module.exports.check_availibality = async (req, res) => {
   }
 };
 
+// GET Geo Code
 module.exports.getGetCode = async (req, res) => {
   try {
     const { lat, long } = req.body;
@@ -766,7 +767,7 @@ module.exports.getGetCode = async (req, res) => {
 
     if (getResponse.data.status == "OK") {
       const address = getResponse.data.results[0].formatted_address;
-      res.status(200).json({ code: 1, address: address });
+      res.status(200).json({ code: 1, data: address });
     } else {
       res.status(400).json({
         code: 2,
@@ -774,6 +775,42 @@ module.exports.getGetCode = async (req, res) => {
       });
     }
   } catch (e) {
-    console.log(e);
+    res.status(400).json({
+      error: e.message(),
+    });
+  }
+};
+
+// GET Sport
+module.exports.get_sports = async (req, res) => {
+  try {
+    const sports = await db.get("select sport_icon,sport_name from sports");
+
+    if (sports.length > 0) {
+      res.status(200).json({ code: 1, data: sports });
+    } else {
+      res.status(400).json({ code: 2, error: "Sports Not Found" });
+    }
+
+    console.log("sports", sports);
+  } catch (e) {
+    res.status(400).json({
+      error: e.message(),
+    });
+  }
+};
+
+//get amentites
+module.exports.get_amenities = async (req, res) => {
+  try {
+    const getAmenties = await db.get("select amenity_name from amenities");
+
+    if (getAmenties.length > 0) {
+      res.status(200).json({ code: 1, data: getAmenties });
+    } else {
+      res.status(400).json({ code: 2, error: "Amenities Not Found" });
+    }
+  } catch (e) {
+    res.status(400).json({ code: 3, error: e.message });
   }
 };
