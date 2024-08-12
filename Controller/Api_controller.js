@@ -4,6 +4,8 @@ const moment = require("moment");
 const format = require("pg-format");
 const bcryptjs = require("bcryptjs");
 const jwt = require("../utilites/jwt");
+const axios = require("axios");
+require("dotenv").config();
 const { validationResult } = require("express-validator");
 
 // User register
@@ -744,5 +746,34 @@ module.exports.check_availibality = async (req, res) => {
         slots: slots,
       });
     }
+  }
+};
+
+module.exports.getGetCode = async (req, res) => {
+  try {
+    const { lat, long } = req.body;
+
+    const getResponse = await axios.get(
+      "https://maps.googleapis.com/maps/api/geocode/json",
+      {
+        params: {
+          latlng: `${lat},${long}`,
+          sensor: "true",
+          key: process.env.GOOGLE_MAP_API_KEY,
+        },
+      }
+    );
+
+    if (getResponse.data.status == "OK") {
+      const address = getResponse.data.results[0].formatted_address;
+      res.status(200).json({ code: 1, address: address });
+    } else {
+      res.status(400).json({
+        code: 2,
+        error: "No address found for the provided coordinates",
+      });
+    }
+  } catch (e) {
+    console.log(e);
   }
 };

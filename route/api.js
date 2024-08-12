@@ -36,5 +36,6 @@ router.post("/getReview", FrontApi.getReviewDetails);
 //router.post("/storereview", upload.none(), FrontApi.store_review);
 router.post("/storereview", uploadMultipleFile, FrontApi.store_review);
 router.post("/check_availability", FrontApi.check_availibality);
+router.post("/getGeoCode", FrontApi.getGetCode);
 
 module.exports = router;
