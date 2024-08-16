@@ -37,5 +37,13 @@ router.post("/getReview", FrontApi.getReviewDetails);
 router.post("/storereview", uploadMultipleFile, FrontApi.store_review);
 router.post("/check_availability", FrontApi.check_availibality);
 router.post("/getGeoCode", FrontApi.getGetCode);
+router.post("/subscribe", FrontApi.subscribe);
+router.post("/pricing_chart", FrontApi.getPricingChart);
+router.post("/save_personal_info", FrontApi.savePersonalInfo);
+router.post("/change_password", FrontApi.change_password);
+router.post("/get_user_booking", FrontApi.get_user_booking);
+router.post("/cancel_booking", FrontApi.cancel_booking);
+router.post("/remove_slot", FrontApi.remove_slot);
+router.post("/view_slot", FrontApi.view_slot);
 
 module.exports = router;

@@ -7,6 +7,8 @@ const jwt = require("../utilites/jwt");
 const axios = require("axios");
 require("dotenv").config();
 const { validationResult } = require("express-validator");
+const nodemailer = require("nodemailer");
+const { password } = require("pg/lib/defaults");
 
 // User register
 module.exports.register = async (req, res) => {
@@ -812,5 +814,294 @@ module.exports.get_amenities = async (req, res) => {
     }
   } catch (e) {
     res.status(400).json({ code: 3, error: e.message });
+  }
+};
+
+//get subscribe
+module.exports.subscribe = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (email != "") {
+      const nademailer = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          username: "",
+          password: "",
+        },
+      });
+
+      const mailinfo = {
+        from: "sagrjagade2023@gmail.com",
+        to: "sagar.jagade@onerooftech.com",
+        subject: "Please Enter subject",
+        text: "Sending subscribe",
+      };
+
+      nodemailer.sendMail(mailinfo, function (err, res) {
+        if (res) {
+          res.status(200).json({
+            email: email,
+            message: `Send The massage sucessfullly - ${res.response}`,
+          });
+        } else {
+          res.status(200).json({ error: err });
+        }
+      });
+    } else {
+      res.status(200).json({ message: "Please Provide Email Address" });
+    }
+  } catch (e) {
+    res.status(400).json({ error: e.message() });
+  }
+};
+
+//get pricing chart
+module.exports.getPricingChart = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    const checkValExits = await db.query("select * from turfs where id = $1", [
+      id,
+    ]);
+
+    if (checkValExits.rowCount == 0) {
+      res
+        .status(200)
+        .json({ message: "Turf Does Not Exists or Been Removed By Admin" });
+    }
+
+    const pricing_chart = await db.query(
+      "select * from turf_media where turf_id = $1 and media_type = $2",
+      [id, 4]
+    );
+
+    if (pricing_chart.rowCount > 0) {
+      if (pricing_chart.rows.media_path != null) {
+        res.status(200).json({
+          code: 1,
+          msg: "Pricing Chart Found",
+          data: pricing_chart.rows[0],
+        });
+      } else {
+        res.status(200).json({
+          code: 2,
+          msg: "Pricing Not Chart Found",
+          data: pricing_chart.rows[0],
+        });
+      }
+    } else {
+      res.status(200).json({ message: "Pricing Chart Not Found" });
+    }
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+};
+
+//save personal info
+module.exports.savePersonalInfo = async (req, res) => {
+  try {
+    const { name, email, mobile_number } = req.body;
+
+    const updateQuery = `update users SET name = ${1}, email = ${2}, mobile_no = ${3} where id = ${id}`;
+    const update = await db.query(updateQuery, [
+      name,
+      email,
+      mobile_number,
+      id,
+    ]);
+
+    if (update.rowCount > 0) {
+      res.status(200).json({ code: 1, msg: "Info Stored Successfully" });
+    } else {
+      res.status(200).json({ code: 2, msg: "Something went to wrong" });
+    }
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
+};
+
+//change password
+module.exports.change_password = async (req, res) => {
+  try {
+    const { id, password } = req.body;
+
+    bcryptjs.hash(password, 10, async (err, hashPassword) => {
+      if (err) {
+        res.status(400).json({
+          code: 3,
+          msg: "Something went wrong with password",
+        });
+      } else {
+        const upatePassword = await db.query(
+          "update users SET password = $1 where id = $2",
+          [hashPassword, id]
+        );
+
+        if (upatePassword.rowCount > 0) {
+          res
+            .status(200)
+            .json({ code: 1, msg: "Update Password successfully" });
+        } else {
+          res
+            .status(200)
+            .json({ code: 2, msg: "Unsuccessfully Update Password" });
+        }
+      }
+    });
+  } catch (e) {
+    res.status(400).json({ code: 4, msg: e.message });
+  }
+};
+
+//get user booking
+module.exports.get_user_booking = async (req, res) => {
+  try {
+    const { id, status, pageno } = req.body;
+    const perPage = 5;
+
+    const offset = (pageno - 1) * perPage;
+
+    const userQuery = `select tb.id,tb.turf_id,tb.total_amount,tb.turf_name,tb.status,tb.cancel_reason
+                       from turf_bookings as tb left join turfs as t on tb.turf_id = t.id
+                      where tb.user_id = ${1} and tb.status = ${2} order by id desc offset ${3} limit ${4}`;
+
+    const total_items = await db.query(userQuery, [
+      id,
+      status,
+      offset,
+      perPage,
+    ]);
+
+    if (total_items.rowCount > 0) {
+      res.status(200).json({
+        code: 1,
+        msg: "Data found successfully",
+        data: total_items.rows[0],
+        total_items: total_items.rowCount,
+      });
+    } else {
+      res.status(200).json({ code: 2, msg: "No Data Found" });
+    }
+  } catch (e) {
+    res.status(400).json({ code: 3, msg: e.message });
+  }
+};
+
+//cancelbooking
+module.exports.cancel_booking = async (req, res) => {
+  try {
+    const { booking_id, cacnel_reason } = req.body;
+
+    const reason = `Booking Cancelled By User -- ${cacnel_reason}`;
+    const change_status = await db.query(
+      "update turf_bookings SET status = $1, cancel_reason = $2 where id = $3",
+      [2, reason, booking_id]
+    );
+
+    if (change_status.rowCount > 0) {
+      const getbooking = await db.query(
+        "select * from turf_booking where id=$1",
+        [booking_id]
+      );
+
+      const bookingInfo = {
+        name: getbooking.rows[0].user_name,
+        booking_id: "Tw",
+        reason: cacnel_reason,
+      };
+
+      //send mail
+      const transport = nodemailer.createTransport({
+        service: "gmail",
+        auth: { username: "", password: "" },
+      });
+
+      const mailInfcancel = {
+        from: "",
+        to: "",
+        subject: "Turfwala | Booking Cancelled",
+        text: "",
+      };
+
+      transport.sendMail(mailInfcancel, async (err, result) => {
+        if (err) {
+          res.status(200).json({ code: 3, msg: err });
+        } else {
+          res.status(200).json({ code: 1, msg: "Booking Cancelled" });
+        }
+      });
+    } else {
+      res.status(200).json({
+        code: 2,
+        msg: "Something went wrong. Please try again later.",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({ code: 3, msg: e.message });
+  }
+};
+
+//remove slot
+module.exports.remove_slot = async (req, res) => {
+  try {
+    const { cart_id } = req.body;
+
+    const removeSlot = await db.query(
+      "update slot_cart SET status = $1, updated_at = $2 Where id = $3",
+      [0, new Date(), cart_id]
+    );
+
+    if (removeSlot.rowCount > 0) {
+      res.status(200).json({ code: 1, msg: "Remove Slots" });
+    } else {
+      res.status(200).json({ code: 2, msg: "Something went wrong" });
+    }
+  } catch (e) {
+    res.status(400).json({ code: 4, msg: e.message });
+  }
+};
+
+//view slot
+module.exports.view_slot = async (req, res) => {
+  try {
+    const { turf_id, user_id } = req.body;
+
+    const checkIdavailable = await db.query(
+      "select * from  turfs where id=$1 and deleted_at IS NOT NULL",
+      [turf_id]
+    );
+
+    if (checkIdavailable.rowCount > 0) {
+      res.status(200).json({ code: 2, msg: "Turf Doesn't exits" });
+    }
+
+    const selected_slots = await db.query(
+      "select id,booking_date,start_time,end_time,TO_CHAR(start_time, 'HH:MI AM') as display_start,TO_CHAR(end_time, 'HH:MI AM') as display_end,TO_CHAR(booking_date, 'Mon DD, YYYY') as display_date from slot_cart where turf_id = $1 and user_id = $2 and status =$3",
+      [turf_id, user_id, 1]
+    );
+
+    const total_price = await db.query(
+      "select SUM(price) AS total_price from slot_cart where turf_id = $1 and user_id = $2 and status =$3",
+      [turf_id, user_id, 1]
+    );
+
+    if (selected_slots.rowCount > 0) {
+      res.status(200).json({
+        code: 1,
+        msg: "Slots Found",
+        data: selected_slots.rows[0],
+        total_price: total_price.rows[0].total_price,
+      });
+    } else {
+      res.status(200).json({
+        code: 3,
+        msg: "Slots Not Found",
+        data: "",
+        total_price: "",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({ code: 4, msg: req.message });
   }
 };
