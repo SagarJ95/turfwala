@@ -47,5 +47,6 @@ router.post("/remove_slot", FrontApi.remove_slot);
 router.post("/view_slot", FrontApi.view_slot);
 router.post("/book_turf", FrontApi.book_turf);
 router.post("/list_turf_form", FrontApi.list_turf_form);
+router.post("/check_slot_availability", FrontApi.check_slot_availability);
 
 module.exports = router;
