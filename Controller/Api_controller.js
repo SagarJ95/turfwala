@@ -9,6 +9,9 @@ require("dotenv").config();
 const { validationResult } = require("express-validator");
 const nodemailer = require("nodemailer");
 const { password } = require("pg/lib/defaults");
+const knex = require("knex")({
+  client: "pg", // Specify the database client
+});
 
 // User register
 module.exports.register = async (req, res) => {
@@ -1103,5 +1106,267 @@ module.exports.view_slot = async (req, res) => {
     }
   } catch (e) {
     res.status(400).json({ code: 4, msg: req.message });
+  }
+};
+
+// Turf Booking for Front User
+module.exports.book_turf = async (req, res) => {
+  try {
+    const {
+      user_name,
+      email,
+      mobile_number,
+      turf_id,
+      players,
+      amount_received,
+      booking_slots,
+    } = req.body;
+
+    const check_user = await db.query(
+      "select * from users where email =$1 OR mobile_no = $2 ",
+      [email, mobile_number]
+    );
+
+    if (check_user.rowCount > 0) {
+      bcryptjs.hash(mobile_number, 10, async (err, hashP) => {
+        if (err) {
+          res.status(400).json({ code: 4, msg: req.message });
+        } else {
+          const InsertQuery = `Insert into users(name,email,mobile_no,password) values($1,$2,$3,$4) RETURNING *`;
+          const excuteQuery = await db.query(InsertQuery, [
+            user_name,
+            email,
+            mobile_number,
+            hashP,
+          ]);
+
+          const getUserId = excuteQuery.rows[0].id;
+        }
+      });
+    } else {
+      const get_user = check_user.rows[0].id;
+    }
+
+    const createBooking = `Insert into turf_booking(turf_id,players,user_id,created_at,updated_at,
+                          user_name,email,mobile_no,status,amount_received) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+                          RETURNING *`;
+
+    const save_data = await db.query(createBooking, [
+      turf_id,
+      players,
+      get_user,
+      new Date(),
+      new Date(),
+      user_name,
+      email,
+      mobile_number,
+      0,
+      amount_received,
+    ]);
+
+    if (save_data.rowCount > 0) {
+      const booking_id = save_data.rows[0].id;
+      const total_amount = 0;
+      const insert_slot_data = [];
+
+      booking_slots.forEach((element, index) => {
+        const slots = element.slots;
+        const slotData = {
+          booking_id: booking_id,
+          booking_date: element.id,
+          start_time: slots[0],
+          end_time: slots[1],
+          price: slots[3],
+          status: 0,
+          created_at: new Date(),
+          updated_at: new Date(),
+        };
+
+        insert_slot_data.push(slotData);
+        total_amount += slots[2];
+      });
+
+      const save_slots = await knex("booking_slots").insert(insert_slot_data);
+
+      const updateTotalAmount = await db.query(
+        "update turf_bookings SET total_amount = $1 where id = $2",
+        [total_amount, booking_id]
+      );
+
+      const Cart_Table = `update slot_cart SET user_id = $1 ,status = $2 where user_id = $3`;
+      const getcartTable = await db.query(Cart_Table, [user_id, get_user, 0]);
+
+      if (save_slots.rowCount > 0) {
+        const user = await db.query("select * from users where id=$1", [
+          get_user,
+        ]);
+
+        const pay_data = {
+          payment_amount: amount_received,
+          user_name: user.rows[0].user_name,
+          user_email: user.rows[0].user_email,
+          booking_id: booking_id,
+        };
+
+        res.status(200).json({ code: 1, msg: "Booked", data: pay_data });
+      } else {
+        res.status(200).json({ code: 3, msg: "Failed" });
+      }
+    } else {
+      res.status(200).json({ code: 3, msg: "Failed" });
+    }
+  } catch (e) {
+    res.status(400).json({
+      code: 4,
+      msg: e.message,
+    });
+  }
+};
+
+module.exports.list_turf_form = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      mobile_no,
+      turf_name,
+      turf_address,
+      google_maps_link,
+    } = req.body;
+
+    const insert_data = {
+      name: name,
+      email: email,
+      mobile_no: mobile_no,
+      turf_name: turf_name,
+      turf_address: turf_address,
+      google_maps_link: google_maps_link,
+    };
+
+    const save_data = await knex("list_turfs").insert(insert_data);
+
+    //send mail to user
+    const usermail = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "your-email@gmail.com",
+        pass: "your-password",
+      },
+    });
+
+    const userOptionConfig = {
+      from: "",
+      to: "",
+      subject: "Turf Booking",
+      text: `Your turf booking is successful`,
+    };
+
+    usermail.sendMail(userOptionConfig, (err, result) => {
+      if (err) {
+        res.status(400).json({ code: 3, msg: err });
+        return;
+      }
+
+      res.status(200).json({ code: 1, msg: "send successfully" });
+    });
+
+    //send to admin
+    const adminMailConfig = {
+      from: "",
+      to: "",
+      subject: "New Turf Booking",
+      text: `New turf booking from ${name}`,
+    };
+
+    usermail.sendMail(adminMailConfig, (err, result) => {
+      if (err) {
+        res.status(400).json({ code: 3, msg: err });
+        return;
+      }
+
+      res.status(200).json({ code: 1, msg: "admin send successfully" });
+    });
+
+    if (save_data.rowCount > 0) {
+      re.status(200).json({
+        code: 1,
+        msg: "Data Inserted Successfully",
+      });
+    } else {
+      res.status(200).json({
+        code: 3,
+        msg: "Something went wrong. Please try again later.",
+      });
+    }
+  } catch (e) {
+    res.status(400).json({
+      code: 3,
+      msg: e.message,
+    });
+  }
+};
+
+module.exports.check_slot_availability = async (req, res) => {
+  try {
+    const { turf_id, slot, user_id } = req.body;
+    const checkTurfid = await db.query("select * from turfs where id = $1", [
+      turf_id,
+    ]);
+
+    if (checkTurfid.rowCount > 0) {
+      const slot = slot.split("-");
+      const booking_date = slot[0];
+      const start_time = slot[1];
+      const end_time = slot[2];
+      const price = slot[3];
+
+      const check_slot = await db.query(
+        "select * from turf_bookings as tb left join booking_slots as bs on tb.id = bs.booking_id where tb.turf_id = $1 and bs.booking_date = $2 and bs.start_time = $3 and bs.end_time = $3 and tb.deleted_at IS NOT NULL",
+        [turf_id, booking_date, start_time, end_time]
+      );
+
+      const check_cart = await db.query(
+        "select * from slot_cart as tb  where tb.turf_id = $1 and bs.booking_date = $2 and bs.start_time = $3 and bs.end_time = $3 and tb.status = $4",
+        [turf_id, booking_date, start_time, end_time, status]
+      );
+
+      if (check_slot.rowCount > 0) {
+        const insert_data = {
+          user_id: user_id,
+          turf_id: turf_id,
+          booking_date: booking_date,
+          start_time: start_time,
+          end_time: end_time,
+          status: 1,
+          price: price,
+          created_at: new Date(),
+        };
+        // Remove Previous Bookings of turfs
+        const today = new Date();
+        const previousDate = new Date(today);
+        previousDate.setDate(today.getDate() - 1);
+
+        const formattedDate = previousDate.toISOString().split("T")[0];
+
+        const slot_cart = await db.query(
+          "update slot_cart SET booking_date <= $1 WHERE status = $2",
+          [previous_date, 0]
+        );
+        const saveData = await knex("slot_cart").insert(insert_data);
+
+        if (save_data.rowCount > 0) {
+          res.json({ message: "Slot Added Successfully", status: 200 });
+        } else {
+          res.json({ message: "Failed to Add Slot", status: 400 });
+        }
+      } else {
+        res.status(200).json({
+          code: 3,
+          msg: "Slot Unavailable",
+        });
+      }
+    }
+  } catch (e) {
+    res.status(400).json({ code: 3, msg: e.message });
   }
 };
