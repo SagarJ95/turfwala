@@ -1,0 +1,283 @@
+body {
+  background-color: #fff;
+  position: relative;
+}
+
+body.offcanvas-menu:before {
+  opacity: 1;
+  z-index: 1002;
+  visibility: visible;
+}
+
+a {
+  font-family: "Athena-light";
+  -webkit-transition: 0.3s all ease;
+  -o-transition: 0.3s all ease;
+  transition: 0.3s all ease;
+}
+
+a,
+a:hover {
+  text-decoration: none !important;
+}
+
+/* Login Page CSS */
+
+.image-col {
+  min-height: 100vh;
+  width: 100%;
+  background-image: url('../images/home/login/turf.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboradBox {
+  background-color: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dsbBtn {
+  padding: 12px 36px;
+  border-radius: 10px;
+  background-color: #149d52;
+  border: 0;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.turfOwn a {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-size: 10px;
+  color: #929292;
+}
+
+/* --------------------Form side Css----------------- */
+
+.logoDiv {
+  width: 70px;
+  height: 75px;
+  margin-bottom: 30px;
+}
+
+.logoImg {
+  width: 100%;
+  height: 100%;
+}
+
+.form-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0 60px;
+}
+
+.regFormDiv {
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px 0 #d3d3d3;
+  width: 100%;
+  height: auto;
+  padding: 20px;
+}
+
+.header h6 {
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: #192335;
+  line-height: 24px;
+}
+
+.para-turf p {
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #6b7385;
+  line-height: 18px;
+}
+
+.radioBtnDiv {
+  display: flex;
+  align-items: center;
+}
+
+.form-check-input:checked {
+  background-color: #149d52;
+  border-color: #149d52 !important;
+}
+
+.form-check-input:checked~label {
+  color: #149d52;
+}
+
+.form-check-input:focus {
+  box-shadow: none !important;
+}
+
+.textInp {
+  background-color: #fafafa !important;
+  border: none !important;
+  padding: 10px;
+}
+
+.emailInp {
+  background-color: #fafafa !important;
+  border: none !important;
+}
+
+input::placeholder {
+  font-size: 13px;
+  font-family: "Outfit", sans-serif;
+  font-weight: 400;
+  color: #6b7385;
+  line-height: 20px;
+}
+
+.form-control:focus {
+  box-shadow: none !important;
+}
+
+.regBtn {
+  width: 35%;
+    margin: 0 auto;
+    display: block;
+  text-align: center;
+  background-color: #149d52;
+  color: #fff;
+  font-size: 14px;
+  border: 1px solid #149d52;
+  border-radius: 10px;
+  font-weight: 500;
+  padding: 8px 0;
+  font-family: "Outfit", sans-serif;
+  line-height: 20px;
+}
+
+.loginBorderDiv {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Outfit", sans-serif;
+  font-size: 12px;
+  color: #6b7385;
+}
+
+.loginBorder {
+  height: 1px;
+  width: 200px;
+  margin-right: 15px;
+  background-color: #9c9c9c;
+}
+
+.loginBorder1 {
+  height: 1px;
+  width: 200px;
+  margin-left: 15px;
+  background-color: #9c9c9c;
+}
+
+.otpBtn {
+  text-align: center;
+  background-color: #149d52;
+  color: #fff;
+  font-size: 14px;
+  border: 1px solid #149d52;
+  border-radius: 10px;
+  font-weight: 500;
+  padding: 10px 50px;
+  font-family: "Outfit", sans-serif;
+  line-height: 20px;
+}
+
+.OtptextSect h5 {
+  font-family: "Outfit", sans-serif;
+  font-size: 16px;
+  color: #000;
+  line-height: 20px;
+}
+
+.OtptextSect p {
+  font-family: "Outfit", sans-serif;
+  font-size: 14px;
+  color: #6b7385;
+  line-height: 20px;
+}
+
+.OtpInp {
+  width: 60px;
+  height: 60px;
+  margin: 0 10px;
+  background-color: #f3f3f3 !important;
+  border: none !important;
+  outline: none !important;
+  text-align: center;
+}
+
+.OtpBtnSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.resendBtn {
+  text-align: center;
+  background-color: transparent;
+  color: #149d52;
+  font-size: 14px;
+  border: 1px solid #149d52;
+  border-radius: 10px;
+  font-weight: 500;
+  padding: 10px 40px;
+  font-family: "Outfit", sans-serif;
+  line-height: 20px;
+}
+
+.submitBtn {
+  text-align: center;
+  background-color: #149d52;
+  color: #fff;
+  font-size: 14px;
+  border: 1px solid #149d52;
+  border-radius: 10px;
+  font-weight: 500;
+  padding: 10px 50px;
+  font-family: "Outfit", sans-serif;
+  line-height: 20px;
+}
+.fp-div {
+  padding: 10px;
+  text-align: right;
+}
+.fp-div a {
+  font-family: inherit;
+    font-size: 14px;
+    color: #585b5e;
+    font-weight: 400;
+}
+.email-otp {
+  background: #149d52;
+    padding: 10px 25px;
+    margin-left: 10px;
+    border-radius: 5px;
+    color: #fff;
+    font-family: "Outfit", sans-serif;
+    text-transform: capitalize;
+}
+.display-flex {
+  display: flex;
+}

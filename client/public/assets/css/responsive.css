@@ -1,0 +1,60 @@
+/*1280x800*/
+@media only screen and (min-width: 1270px) and (max-width: 1290px) {
+}
+@media only screen and (device-width: 1280px) and (device-height: 720px) {
+}
+/*1400x900*/
+@media only screen and (min-width: 1430px) and (max-width: 1450px) {
+}
+/*1920x1080*/
+@media only screen and (min-width: 1910px) and (max-width: 1930px) {
+}
+
+/*mobile responsive*/
+@media only screen and (min-width: 300px) and (max-width: 768px) {
+    .modalFirstCol {
+        padding: 0 !important;
+    }
+
+    .borderDiv {
+        border-right: 1px dotted #000;
+        height: 1px;
+        width: 120px;
+        margin-top: 8px !important;
+        margin-right: 8px !important;
+    }
+
+    .borderDiv1 {
+        border-right: 1px dotted #000;
+        height: 1px;
+        width: 120px;
+        margin-top: 8px !important;
+        margin-right: 8px !important;
+    }
+
+    .hrCol {
+        flex-direction: row;
+    }
+
+    .image-col {
+        min-height: 50vh;
+    }
+
+    .form-col {
+        padding: 0 20px;
+    }
+
+    .sportBanner {
+        width: 100%;
+        height: 20vh;
+    }
+
+    .timeslot-sec {
+        padding: 25% 0;
+        background-color: #fff;
+    }
+
+    .owl-carousel {
+        z-index: 0 !important;
+    }
+}

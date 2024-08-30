@@ -4,7 +4,7 @@ const Defineroute = require("./route/api");
 const DefineAdminroute = require("./route/AdminApi");
 const bodyParser = require("body-parser");
 require("dotenv").config();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // To parse JSON bodies
 // app.use(bodyParser.json());
