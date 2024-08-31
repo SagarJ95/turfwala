@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   return (
@@ -9,13 +10,13 @@ const Login = () => {
             <div className="col-lg-6 col-sm-12 p-0">
               <div className="image-col">
                 <div className="dashboradBox">
-                  <a href="index.html">
+                  <Link to="/">
                     <button className="dsbBtn">
                       Go to our manager dashboard
                     </button>
-                  </a>
+                  </Link>
                   <p className="turfOwn m-1">
-                    <a href="index.html">Already own a Turf?</a>
+                    <Link to="/">Already own a Turf?</Link>
                   </p>
                 </div>
               </div>
@@ -30,7 +31,7 @@ const Login = () => {
                   />
                 </div>
                 <div className="regFormDiv">
-                  <div className="header">
+                  <div className="">
                     <h6>Welcome to Turfwala</h6>
                   </div>
                   <div className="para-turf">
