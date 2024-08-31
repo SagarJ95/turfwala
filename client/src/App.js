@@ -5,6 +5,7 @@ import {
   Routes,
   swith,
 } from "react-router-dom";
+import Login from "./components/layout/login";
 import Home from "./components/layout/Home";
 import TurfDetails from "./components/layout/turf_details";
 import userBooking from "./components/layout/user_booking";
@@ -15,6 +16,7 @@ const App = () => (
     <Fragment>
       <Routes>
         <Route exact path="/" Component={Home} />
+        <Route exact path="/login" Component={Login} />
         <Route exact path="/turf_details" Component={TurfDetails} />
         <Route exact path="/user_booking" Component={userBooking} />
       </Routes>

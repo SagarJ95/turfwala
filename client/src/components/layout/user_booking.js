@@ -48,7 +48,7 @@ const userBooking = () => {
                       </a>
                       <div className="login-dd">
                         <div className="dropdown">
-                          <div onclick="login_dd()" className="dropbtn">
+                          <div onClick="login_dd()" className="dropbtn">
                             <i className="fa-solid fa-angle-down"></i>
                           </div>
                           <div id="logindd" className="dropdown-content">
@@ -202,7 +202,7 @@ const userBooking = () => {
                                 <td className="vm">
                                   <div className="dropdown">
                                     <div
-                                      onclick="book_action()"
+                                      onClick="book_action()"
                                       className="dropbtn"
                                     >
                                       <i className="fa-solid fa-ellipsis"></i>
@@ -234,7 +234,7 @@ const userBooking = () => {
                                 <td className="vm">
                                   <div className="dropdown">
                                     <div
-                                      onclick="book_action()"
+                                      onClick="book_action()"
                                       className="dropbtn"
                                     >
                                       <i className="fa-solid fa-ellipsis"></i>
