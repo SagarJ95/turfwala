@@ -1,4 +1,8 @@
 import React from "react";
+import "owl.carousel/dist/assets/owl.carousel.css";
+import "owl.carousel/dist/assets/owl.theme.default.css";
+import "jquery/dist/jquery.min.js";
+import OwlCarousel from "react-owl-carousel";
 
 const Home = () => {
   return (
@@ -1035,7 +1039,14 @@ const Home = () => {
           <div className="row">
             <div className="col-lg-12">
               <div className="owl-slider">
-                <div id="top-picks" className="owl-carousel">
+                {/* <div id="top-picks" className="owl-carousel"> */}
+                <OwlCarousel
+                  className="owl-theme"
+                  loop
+                  margin={10}
+                  autoplay={true}
+                  nav
+                >
                   <div className="item">
                     <a href="#">
                       <div className="card">
@@ -1719,7 +1730,7 @@ const Home = () => {
                       </div>
                     </a>
                   </div>
-                </div>
+                </OwlCarousel>
               </div>
             </div>
           </div>
@@ -1750,7 +1761,7 @@ const Home = () => {
           <div className="row">
             <div className="col-lg-12">
               <div className="owl-slider">
-                <div id="latest-picks" className="owl-carousel">
+                <OwlCarousel className="owl-theme" margin={3} autoplay={true}>
                   <div className="item">
                     <a href="#">
                       <div className="card">
@@ -2434,7 +2445,7 @@ const Home = () => {
                       </div>
                     </a>
                   </div>
-                </div>
+                </OwlCarousel>
               </div>
             </div>
           </div>
