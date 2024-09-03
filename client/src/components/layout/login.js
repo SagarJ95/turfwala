@@ -1,7 +1,23 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Login = () => {
+  const [formData, setformData] = useState({
+    Regname: '',
+    Regemail: '',
+    Regmobileno: '',
+    Regpassword: ''
+  });
+
+  const { Regname, Regemail, Regmobileno, Regpassword } = formData;
+
+  const onChange = e => setformData({ ...formData, [e.target.name]: e.target.value })
+
+  const onsubmit = e => {
+    e.preventDefault();
+    console.log(formData)
+  }
+
   return (
     <>
       <Fragment>
@@ -150,7 +166,7 @@ const Login = () => {
                                 role="tab"
                                 aria-controls="pills-otp"
                                 aria-selected="false"
-                                onclick="myFunction()"
+                                onClick="myFunction()"
                               >
                                 Request OTP
                               </button>
@@ -166,12 +182,14 @@ const Login = () => {
                         aria-labelledby="pills-register-tab"
                         tabindex="0"
                       >
-                        <form action="" className="mt-4">
+                        <form className="mt-4" onSubmit={e => onsubmit(e)}>
                           <div className="mb-3">
                             <input
                               type="text"
                               className="textInp form-control"
-                              id="name"
+                              name="Regname"
+                              value={Regname}
+                              onChange={e => onChange(e)}
                               placeholder="Enter Name"
                             />
                           </div>
@@ -180,7 +198,10 @@ const Login = () => {
                             <input
                               type="email"
                               className="emailInp form-control"
-                              id="email"
+                              id="Regemail"
+                              name="Regemail"
+                              value={Regemail}
+                              onChange={e => onChange(e)}
                               placeholder="Enter E-mail Address"
                             />
                           </div>
@@ -189,7 +210,10 @@ const Login = () => {
                             <input
                               type="text"
                               className="textInp form-control"
-                              id="mobileno"
+                              id="Regmobileno"
+                              name="Regmobileno"
+                              value={Regmobileno}
+                              onChange={e => onChange(e)}
                               placeholder="Enter Mobile Number"
                             />
                           </div>
@@ -198,16 +222,18 @@ const Login = () => {
                             <input
                               type="password"
                               className="textInp form-control"
-                              id="password"
+                              id="Regpassword"
+                              name="Regpassword"
+                              value={Regpassword}
+                              onChange={e => onChange(e)}
                               placeholder="Enter Password"
                             />
                           </div>
 
-                          <a href="index.html">
-                            <button className="regBtn" type="button">
-                              Register Now
-                            </button>
-                          </a>
+
+                          <input className="regBtn" type="submit" value='Register Now' />
+
+
                         </form>
                       </div>
                     </div>
