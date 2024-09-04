@@ -2,22 +2,39 @@ import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Login = () => {
+  //Register Form
   const [formData, setformData] = useState({
-    Regname: '',
-    Regemail: '',
-    Regmobileno: '',
-    Regpassword: ''
+    Regname: "",
+    Regemail: "",
+    Regmobileno: "",
+    Regpassword: "",
   });
 
   const { Regname, Regemail, Regmobileno, Regpassword } = formData;
 
-  const onChange = e => setformData({ ...formData, [e.target.name]: e.target.value })
+  const onChange = (e) =>
+    setformData({ ...formData, [e.target.name]: e.target.value });
 
-  const onsubmit = e => {
+  const onsubmit = (e) => {
     e.preventDefault();
-    console.log(formData)
-  }
+    console.log(formData);
+  };
 
+  //loginPage Form
+  const [logFormData, SetLogFormData] = useState({
+    Logemail: "",
+    Logpassword: "",
+  });
+
+  const { Logemail, Logpassword } = logFormData;
+
+  const LogOnChange = (e) =>
+    SetLogFormData({ ...logFormData, [e.target.name]: e.target.value });
+
+  const LogOnSubmit = (e) => {
+    e.preventDefault();
+    console.log("logFormData>", logFormData);
+  };
   return (
     <>
       <Fragment>
@@ -117,12 +134,15 @@ const Login = () => {
                         aria-labelledby="pills-login-tab"
                         tabindex="0"
                       >
-                        <form action="" className="mt-4">
+                        <form className="mt-4" onSubmit={(e) => LogOnSubmit(e)}>
                           <div className="mb-3">
                             <input
                               type="email"
                               className="emailInp form-control"
-                              id="email"
+                              id="Logemail"
+                              name="Logemail"
+                              value={Logemail}
+                              onChange={(e) => LogOnChange(e)}
                               placeholder="Enter E-mail Address"
                             />
                           </div>
@@ -131,7 +151,10 @@ const Login = () => {
                             <input
                               type="password"
                               className="textInp form-control"
-                              id="password"
+                              id="Logpassword"
+                              name="Logpassword"
+                              value={Logpassword}
+                              onChange={(e) => LogOnChange(e)}
                               placeholder="Enter Password"
                             />
                           </div>
@@ -139,11 +162,11 @@ const Login = () => {
                             <a href="">Forget Password?</a>
                           </div>
 
-                          <a href="index.html">
-                            <button className="regBtn" type="button">
-                              Login Now
-                            </button>
-                          </a>
+                          <input
+                            type="submit"
+                            className="regBtn"
+                            value="Login Now"
+                          />
 
                           <div className="loginBorderDiv mt-4">
                             <hr className="loginBorder" />
@@ -182,14 +205,14 @@ const Login = () => {
                         aria-labelledby="pills-register-tab"
                         tabindex="0"
                       >
-                        <form className="mt-4" onSubmit={e => onsubmit(e)}>
+                        <form className="mt-4" onSubmit={(e) => onsubmit(e)}>
                           <div className="mb-3">
                             <input
                               type="text"
                               className="textInp form-control"
                               name="Regname"
                               value={Regname}
-                              onChange={e => onChange(e)}
+                              onChange={(e) => onChange(e)}
                               placeholder="Enter Name"
                             />
                           </div>
@@ -201,7 +224,7 @@ const Login = () => {
                               id="Regemail"
                               name="Regemail"
                               value={Regemail}
-                              onChange={e => onChange(e)}
+                              onChange={(e) => onChange(e)}
                               placeholder="Enter E-mail Address"
                             />
                           </div>
@@ -213,7 +236,7 @@ const Login = () => {
                               id="Regmobileno"
                               name="Regmobileno"
                               value={Regmobileno}
-                              onChange={e => onChange(e)}
+                              onChange={(e) => onChange(e)}
                               placeholder="Enter Mobile Number"
                             />
                           </div>
@@ -225,15 +248,16 @@ const Login = () => {
                               id="Regpassword"
                               name="Regpassword"
                               value={Regpassword}
-                              onChange={e => onChange(e)}
+                              onChange={(e) => onChange(e)}
                               placeholder="Enter Password"
                             />
                           </div>
 
-
-                          <input className="regBtn" type="submit" value='Register Now' />
-
-
+                          <input
+                            className="regBtn"
+                            type="submit"
+                            value="Register Now"
+                          />
                         </form>
                       </div>
                     </div>
