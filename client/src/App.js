@@ -1,24 +1,19 @@
 import React, { Fragment } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  swith,
-} from "react-router-dom";
-import Login from "./components/layout/login";
-import Home from "./components/layout/Home";
-import TurfDetails from "./components/layout/turf_details";
-import userBooking from "./components/layout/user_booking";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import LoginContainer from "./containers/LoginContainer";
+import HomeContainer from "./containers/HomeContainer";
+import TurfDetailsContainer from "./containers/TurfDetailsContainer";
+import userBookingContainer from "./containers/userBookingContainer";
 import "./App.css";
 
 const App = () => (
   <Router>
     <Fragment>
       <Routes>
-        <Route exact path="/" Component={Home} />
-        <Route exact path="/login" Component={Login} />
-        <Route exact path="/turf_details" Component={TurfDetails} />
-        <Route exact path="/user_booking" Component={userBooking} />
+        <Route exact path="/" Component={HomeContainer} />
+        <Route exact path="/login" Component={LoginContainer} />
+        <Route exact path="/turf_details" Component={TurfDetailsContainer} />
+        <Route exact path="/user_booking" Component={userBookingContainer} />
       </Routes>
     </Fragment>
   </Router>
