@@ -21,7 +21,13 @@ const Home = () => {
     }
   };
 
-  componentCount();
+  // Use useEffect to call the API only once when the component mounts
+  useEffect(() => {
+    if (!data) {
+      componentCount();
+    }
+  }, [data]);
+
   console.log("data>", data);
 
   return (
