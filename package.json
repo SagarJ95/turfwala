@@ -1,47 +1,18 @@
 {
-  "name": "turfwala",
+  "name": "tf",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node app",
-    "server": "nodemon app",
-    "client": "npm start --perfix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SagarJ95/turfwala.git"
+    "start": "",
+    "backend": "cd backend && npm start",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run backend\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/SagarJ95/turfwala/issues"
-  },
-  "homepage": "https://github.com/SagarJ95/turfwala#readme",
+  "description": "",
   "dependencies": {
-    "axios": "^1.7.3",
-    "bcryptjs": "^2.4.3",
-    "cheerio": "^1.0.0-rc.12",
-    "concurrently": "^8.2.2",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "express-validator": "^7.1.0",
-    "jquery": "^3.7.1",
-    "jsonwebtoken": "^9.0.2",
-    "knex": "^3.1.0",
-    "moment": "^2.30.1",
-    "multer": "^1.4.5-lts.1",
-    "nodemailer": "^6.9.14",
-    "nodemon": "^3.1.2",
-    "pg": "^8.11.5",
-    "pg-format": "^1.0.4",
-    "react-owl-carousel": "^2.3.3",
-    "sharp": "^0.33.1"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.2",
-    "nodemon": "^3.1.2"
+    "concurrently": "^9.0.1"
   }
 }
