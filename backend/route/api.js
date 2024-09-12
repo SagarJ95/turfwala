@@ -4,6 +4,7 @@ const {
   registerValidation,
   loginVaidation,
 } = require("../Middleware/validation");
+const verify_token = require("../utilites/jwt");
 const multer = require("multer");
 const upload = multer();
 

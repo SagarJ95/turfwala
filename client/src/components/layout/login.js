@@ -1,7 +1,12 @@
 import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
-
+import axios from "axios";
+import toastr from "toastr";
+import "react-toastify/dist/ReactToastify.css";
+import "toastr/build/toastr.min.css";
+import { useNavigate } from "react-router-dom";
 const Login = () => {
+  const Navigate = useNavigate();
   //Register Form
   const [formData, setformData] = useState({
     Regname: "",
@@ -15,9 +20,40 @@ const Login = () => {
   const onChange = (e) =>
     setformData({ ...formData, [e.target.name]: e.target.value });
 
-  const onsubmit = (e) => {
+  //submit user registration
+  const onsubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
+
+    const getRegisterData = {
+      name: formData.Regname,
+      email: formData.Regemail,
+      mobile_number: formData.Regmobileno,
+      password: formData.Regpassword,
+    };
+
+    try {
+      const getReposne = await axios.post(
+        "http://localhost:4000/api/register",
+        getRegisterData,
+        {
+          header: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (getReposne.status == 200) {
+        toastr.clear();
+        toastr.success("User register suceessfully");
+        //local stoeage
+        localStorage.setItem("access_token", getReposne.data.access_token);
+        setTimeout(() => Navigate("/"), 3000);
+      }
+    } catch (err) {
+      toastr.clear();
+      toastr.error(err.response.data.error);
+    }
   };
 
   //loginPage Form
@@ -31,9 +67,35 @@ const Login = () => {
   const LogOnChange = (e) =>
     SetLogFormData({ ...logFormData, [e.target.name]: e.target.value });
 
-  const LogOnSubmit = (e) => {
+  //login user
+  const LogOnSubmit = async (e) => {
     e.preventDefault();
-    console.log("logFormData>", logFormData);
+
+    const bodyData = {
+      email: logFormData.Logemail,
+      password: logFormData.Logpassword,
+    };
+
+    try {
+      const loginInfo = await axios.post(
+        "http://localhost:4000/api/login",
+        bodyData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (loginInfo.status == 200) {
+        toastr.clear();
+        toastr.success("User login suceessfully");
+        localStorage.setItem("access_token", loginInfo.data.access_token);
+        setTimeout(() => Navigate("/"), 3000);
+      }
+    } catch (e) {
+      toastr.error(e.response.data.error);
+    }
   };
   return (
     <>
