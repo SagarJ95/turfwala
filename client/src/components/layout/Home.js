@@ -1,8 +1,29 @@
-import React, { Fragment } from "react";
-
+import React, { Fragment, useState, useEffect } from "react";
 import OwlCarousel from "react-owl-carousel";
+import toastr from "toastr";
+import axios from "axios";
 
 const Home = () => {
+  const [data, setData] = useState(null);
+
+  const componentCount = async () => {
+    try {
+      const getHomeData = await axios.get(
+        "http://localhost:4000/api/get_near_by_turf"
+      );
+
+      if (getHomeData.status == 200) {
+        setData(getHomeData.data.result);
+      }
+    } catch (e) {
+      const errorMessage =
+        e.response != undefined ? toastr.error(e.response.data.error) : "";
+    }
+  };
+
+  componentCount();
+  console.log("data>", data);
+
   return (
     <>
       <Fragment>

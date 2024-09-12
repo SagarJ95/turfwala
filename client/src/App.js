@@ -5,6 +5,8 @@ import HomeContainer from "./containers/HomeContainer";
 import TurfDetailsContainer from "./containers/TurfDetailsContainer";
 import userBookingContainer from "./containers/userBookingContainer";
 import "./App.css";
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
 
 const App = () => (
   <Router>
