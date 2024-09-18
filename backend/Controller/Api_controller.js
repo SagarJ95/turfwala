@@ -247,7 +247,36 @@ module.exports.getturfs = async (req, res) => {
 module.exports.getnearbyturf = async (req, res) => {
   try {
     const getTurf = await db.query(
-      "select * from turfs order by id desc limit 8"
+      `       SELECT
+                t.address,
+                t.id,
+                t.turf_name,
+                t.turf_no,
+                t.amenities,
+                t.sports,
+                t.players,
+                t.city,
+                t.pincode,
+                t.latitude,
+                t.longitude,
+                t.region,
+                COALESCE(rx.AverageRatings, 0) AS AverageRating,
+                COALESCE(rx.RatingCount, 0) AS RatingCount
+            FROM
+                turfs t
+            LEFT JOIN (
+                SELECT
+                    r.turf_id,
+                    AVG(r.rating) AS AverageRatings,
+                    COUNT(r.rating) AS RatingCount
+                FROM
+                    reviews r
+                GROUP BY
+                    r.turf_id
+            ) rx ON rx.turf_id = t.id
+            WHERE
+                t.deleted_at IS NULL
+              order by id desc limit 8`
     );
 
     if (getTurf.rowCount > 0) {
@@ -259,16 +288,37 @@ module.exports.getnearbyturf = async (req, res) => {
           const query = `SELECT id,amenity_icon,amenity_name FROM amenities WHERE id = ANY($1::int[])`;
           const values = [ids];
 
-          element.amenities = await db.query(query, values);
+          const { rows: amenitiesData } = await db.query(query, values);
+
+          const getAmenties = amenitiesData.map((data) => ({
+            ...data,
+            amenity_icon: `${process.env.LOCAL_PATH}/${data.amenity_icon}`,
+          }));
+
+          if (amenitiesData.length > 0) {
+            element.amenities = getAmenties;
+          } else {
+            element.amenities = null;
+          }
         }
 
         if (element.sports !== null && element.sports !== "") {
           const sportids = element.sports.split(",").map((id) => id.trim());
 
-          const query = `select id,sport_icon,sport_name from sports where id = ANY($1::int[])`;
+          const query = `select id,front_icon,sport_name from sports where id = ANY($1::int[])`;
           const values = [sportids];
 
-          element.sports = await db.query(query, values);
+          const { rows: sportsResult } = await db.query(query, values);
+          const sportsData = sportsResult.map((sp) => ({
+            ...sp,
+            front_icon: `${process.env.LOCAL_PATH}/${sp.front_icon}`,
+          }));
+
+          if (sportsResult.length > 0) {
+            element.sports = sportsData;
+          } else {
+            element.sports = null;
+          }
         }
 
         if (element.players !== null && element.players !== "") {
@@ -281,20 +331,23 @@ module.exports.getnearbyturf = async (req, res) => {
 
         const turfmediaquery = `select tm.media_path,mt.media_name from turf_media as tm
         left join media_types as mt on tm.media_type = mt.id where tm.turf_id = $1`;
-        const turfvalue = [element.id];
-        const turf_media = await db.query(turfmediaquery, turfvalue);
 
-        if (turf_media.rowCount > 0) {
-          element.media = turf_media.rows;
+        const turfvalue = [element.id];
+        const { rows: turf_media } = await db.query(turfmediaquery, turfvalue);
+        const turfMedia = turf_media.map((medias) => ({
+          ...medias,
+          media_path: `${process.env.LOCAL_PATH}/${medias.media_path}`,
+        }));
+
+        if (turf_media.length > 0) {
+          element.media = turfMedia;
         } else {
           element.media = null;
         }
 
         element.media = element.media ? element.media : null;
-        element.amenities =
-          element.amenities.rowCount > 0 ? element.amenities.rows : null;
-        element.sports =
-          element.sports.rowCount > 0 ? element.sports.rows : null;
+        element.amenities = element.amenities;
+        element.sports = element.sports;
         element.players = element.players ? element.players : null;
 
         return element;

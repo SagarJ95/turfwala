@@ -14,7 +14,11 @@ const App = () => (
       <Routes>
         <Route exact path="/" Component={HomeContainer} />
         <Route exact path="/login" Component={LoginContainer} />
-        <Route exact path="/turf_details" Component={TurfDetailsContainer} />
+        <Route
+          exact
+          path="/turf_details/:id"
+          Component={TurfDetailsContainer}
+        />
         <Route exact path="/user_booking" Component={userBookingContainer} />
       </Routes>
     </Fragment>

@@ -2,9 +2,10 @@ import React, { Fragment, useState, useEffect } from "react";
 import OwlCarousel from "react-owl-carousel";
 import toastr from "toastr";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Home = () => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
 
   const componentCount = async () => {
     try {
@@ -12,7 +13,8 @@ const Home = () => {
         "http://localhost:4000/api/get_near_by_turf"
       );
 
-      if (getHomeData.status == 200) {
+      if (getHomeData.status === 200) {
+        console.log("getHomeData.data.result>>", getHomeData.data.result);
         setData(getHomeData.data.result);
       }
     } catch (e) {
@@ -23,12 +25,10 @@ const Home = () => {
 
   // Use useEffect to call the API only once when the component mounts
   useEffect(() => {
-    if (!data) {
-      componentCount();
-    }
-  }, [data]);
+    componentCount();
+  }, []);
 
-  console.log("data>", data);
+  console.log("data12>", data);
 
   return (
     <>
@@ -95,7 +95,7 @@ const Home = () => {
             <div className="row">
               <div className="col-lg-12">
                 <div className="banner-cont">
-                  <h4>Find turf for sale and for rent near you</h4>
+                  {/* <h4>Find turf for sale and for rent near you</h4> */}
                   <h2>Find Your Perfect Turf</h2>
                   <div className="search-box">
                     <div className="col-lg-4">
@@ -223,780 +223,114 @@ const Home = () => {
 
             <div className="outer">
               <div className="row">
-                <div className="col-lg-3">
-                  <a href="turf-details.html">
-                    <div className="card">
-                      <div className="turf-caro-div">
-                        <div
-                          id="turf-carousel-indicators"
-                          className="carousel slide carousel-fade"
-                          data-bs-ride="carousel"
-                        >
-                          <div className="carousel-indicators">
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators"
-                              data-bs-slide-to="0"
-                              className="active"
-                              aria-current="true"
-                              aria-label="Slide 1"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators"
-                              data-bs-slide-to="1"
-                              aria-label="Slide 2"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators"
-                              data-bs-slide-to="2"
-                              aria-label="Slide 3"
-                            ></button>
-                          </div>
-                          <div className="carousel-inner">
-                            <h5 className="popular">Popular</h5>
-                            <div className="carousel-item active">
-                              <img
-                                src="assets/images/home/turfs/img2.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
+                {data && data.length > 0 ? (
+                  <>
+                    {data.map((item) => {
+                      return (
+                        <div className="col-lg-3">
+                          <Link to={`/turf_details/${item.turf_no}`}>
+                            <div className="card">
+                              <div className="turf-caro-div">
+                                <div
+                                  id="turf-carousel-indicators"
+                                  className="carousel slide carousel-fade"
+                                  data-bs-ride="carousel"
+                                >
+                                  <div className="carousel-indicators">
+                                    <button
+                                      type="button"
+                                      data-bs-target="#turf-carousel-indicators"
+                                      data-bs-slide-to="0"
+                                      className="active"
+                                      aria-current="true"
+                                      aria-label="Slide 1"
+                                    ></button>
+                                    <button
+                                      type="button"
+                                      data-bs-target="#turf-carousel-indicators"
+                                      data-bs-slide-to="1"
+                                      aria-label="Slide 2"
+                                    ></button>
+                                    <button
+                                      type="button"
+                                      data-bs-target="#turf-carousel-indicators"
+                                      data-bs-slide-to="2"
+                                      aria-label="Slide 3"
+                                    ></button>
+                                  </div>
+                                  <div className="carousel-inner">
+                                    {data.media && data.media.length > 0 ? (
+                                      data.media.map((media, index) => (
+                                        <div
+                                          className={`carousel-item ${
+                                            index === 0 ? "active" : ""
+                                          }`}
+                                        >
+                                          <img
+                                            src={media.media_path}
+                                            className="d-block w-100"
+                                            alt={media.media_name}
+                                          />
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <div className="carousel-item active">
+                                        <img
+                                          src="https://5.imimg.com/data5/SELLER/Default/2022/12/GT/XH/CW/2451824/cricket-turf-1000x1000.jpg"
+                                          className="d-block w-100"
+                                          alt=""
+                                        />
+                                      </div>
+                                    )}
+                                    ;
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="main-details">
+                                <div className="turf-details-upper">
+                                  <div className="col-lg-8">
+                                    <h5>{item.turf_name}</h5>
+                                    <h6>{item.city}</h6>
+                                  </div>
+                                  <div className="col-lg-4 text-end">
+                                    <img src="assets/images/home/turfs/rating.svg" />{" "}
+                                    <span>
+                                      {item.ratingcount} ({item.averagerating})
+                                    </span>
+                                  </div>
+                                </div>
+                                <hr />
+                                <div className="turf-details-lower">
+                                  <div className="col-lg-5 col-6 col-6">
+                                    <ul>
+                                      {item.sports && item.sports.length > 0 ? (
+                                        item.sports.map((sport, index) => (
+                                          <li key={index}>
+                                            <img src={sport.front_icon} />
+                                          </li>
+                                        ))
+                                      ) : (
+                                        <li>
+                                          <img src="assets/images/home/turfs/bat.svg" />
+                                        </li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                  <div className="col-lg-7 col-6 text-end">
+                                    <ul></ul>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img3.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img1.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-                          </div>
+                          </Link>
                         </div>
-                      </div>
-
-                      <div className="main-details">
-                        <div className="turf-details-upper">
-                          <div className="col-lg-8">
-                            <h5>Sparta Arena</h5>
-                            <h6>Kakkanad, Kochi</h6>
-                          </div>
-                          <div className="col-lg-4 text-end">
-                            <img src="assets/images/home/turfs/rating.svg" />{" "}
-                            <span>48 (6.9)</span>
-                          </div>
-                        </div>
-                        <hr />
-                        <div className="turf-details-lower">
-                          <div className="col-lg-5 col-6 col-6">
-                            <ul>
-                              <li>
-                                {" "}
-                                <img src="assets/images/home/turfs/bat.svg" />
-                              </li>
-                              <li>
-                                <img src="assets/images/home/turfs/soccer-ball.svg" />
-                              </li>
-                              <li className="nos">+1</li>
-                            </ul>
-                          </div>
-                          <div className="col-lg-7 col-6 text-end">
-                            <ul>
-                              <li>7v7</li>
-                              <li>11v11</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-
-                <div className="col-lg-3">
-                  <a href="#">
-                    <div className="card">
-                      <div className="turf-caro-div">
-                        <div
-                          id="turf-carousel-indicators1"
-                          className="carousel slide carousel-fade"
-                          data-bs-ride="carousel"
-                        >
-                          <div className="carousel-indicators">
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators1"
-                              data-bs-slide-to="0"
-                              className="active"
-                              aria-current="true"
-                              aria-label="Slide 1"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators1"
-                              data-bs-slide-to="1"
-                              aria-label="Slide 2"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators1"
-                              data-bs-slide-to="2"
-                              aria-label="Slide 3"
-                            ></button>
-                          </div>
-                          <div className="carousel-inner">
-                            <div className="carousel-item active">
-                              <img
-                                src="assets/images/home/turfs/img3.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img1.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img2.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="main-details">
-                        <div className="turf-details-upper">
-                          <div className="col-lg-8">
-                            <h5>Sporthood Turfpark</h5>
-                            <h6>Vazhakkad, Kozhikode</h6>
-                          </div>
-                          <div className="col-lg-4 text-end">
-                            <img src="assets/images/home/turfs/rating.svg" />{" "}
-                            <span>48 (98)</span>
-                          </div>
-                        </div>
-                        <hr />
-                        <div className="turf-details-lower">
-                          <div className="col-lg-5 col-6">
-                            <ul>
-                              <li>
-                                {" "}
-                                <img src="assets/images/home/turfs/bat.svg" />
-                              </li>
-                              <li>
-                                <img src="assets/images/home/turfs/soccer-ball.svg" />
-                              </li>
-                              <li className="nos">+1</li>
-                            </ul>
-                          </div>
-                          <div className="col-lg-7 col-6 text-end">
-                            <ul>
-                              <li>7v7</li>
-                              <li>11v11</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-
-                <div className="col-lg-3">
-                  <a href="#">
-                    <div className="card">
-                      <div className="turf-caro-div">
-                        <div
-                          id="turf-carousel-indicators2"
-                          className="carousel slide carousel-fade"
-                          data-bs-ride="carousel"
-                        >
-                          <div className="carousel-indicators">
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators2"
-                              data-bs-slide-to="0"
-                              className="active"
-                              aria-current="true"
-                              aria-label="Slide 1"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators2"
-                              data-bs-slide-to="1"
-                              aria-label="Slide 2"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators2"
-                              data-bs-slide-to="2"
-                              aria-label="Slide 3"
-                            ></button>
-                          </div>
-                          <div className="carousel-inner">
-                            <h5 className="popular">Popular</h5>
-                            <div className="carousel-item active">
-                              <img
-                                src="assets/images/home/turfs/img1.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img2.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img3.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="main-details">
-                        <div className="turf-details-upper">
-                          <div className="col-lg-8">
-                            <h5>Gamma Football</h5>
-                            <h6>Shobha City Mall, Thrissur</h6>
-                          </div>
-                          <div className="col-lg-4 text-end">
-                            <img src="assets/images/home/turfs/rating.svg" />{" "}
-                            <span>48 (6.9)</span>
-                          </div>
-                        </div>
-                        <hr />
-                        <div className="turf-details-lower">
-                          <div className="col-lg-5 col-6">
-                            <ul>
-                              <li>
-                                {" "}
-                                <img src="assets/images/home/turfs/bat.svg" />
-                              </li>
-                              <li>
-                                <img src="assets/images/home/turfs/soccer-ball.svg" />
-                              </li>
-                              <li className="nos">+1</li>
-                            </ul>
-                          </div>
-                          <div className="col-lg-7 col-6 text-end">
-                            <ul>
-                              <li>7v7</li>
-                              <li>11v11</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-                <div className="col-lg-3">
-                  <a href="#">
-                    <div className="card">
-                      <div className="turf-caro-div">
-                        <div
-                          id="turf-carousel-indicators3"
-                          className="carousel slide carousel-fade"
-                          data-bs-ride="carousel"
-                        >
-                          <div className="carousel-indicators">
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators3"
-                              data-bs-slide-to="0"
-                              className="active"
-                              aria-current="true"
-                              aria-label="Slide 1"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators3"
-                              data-bs-slide-to="1"
-                              aria-label="Slide 2"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators3"
-                              data-bs-slide-to="2"
-                              aria-label="Slide 3"
-                            ></button>
-                          </div>
-                          <div className="carousel-inner">
-                            <h5 className="featured">Featured</h5>
-                            <div className="carousel-item active">
-                              <img
-                                src="assets/images/home/turfs/img2.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img3.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img1.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="main-details">
-                        <div className="turf-details-upper">
-                          <div className="col-lg-8">
-                            <h5>Parkway</h5>
-                            <h6>Kolathara, Kozhikode</h6>
-                          </div>
-                          <div className="col-lg-4 text-end">
-                            <img src="assets/images/home/turfs/rating.svg" />{" "}
-                            <span>48 (6.9)</span>
-                          </div>
-                        </div>
-                        <hr />
-                        <div className="turf-details-lower">
-                          <div className="col-lg-5 col-6">
-                            <ul>
-                              <li>
-                                {" "}
-                                <img src="assets/images/home/turfs/bat.svg" />
-                              </li>
-                              <li>
-                                <img src="assets/images/home/turfs/soccer-ball.svg" />
-                              </li>
-                              <li className="nos">+1</li>
-                            </ul>
-                          </div>
-                          <div className="col-lg-7 col-6 text-end">
-                            <ul>
-                              <li>7v7</li>
-                              <li>11v11</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="outer">
-              <div className="row">
-                <div className="col-lg-3">
-                  <a href="turf-details.html">
-                    <div className="card">
-                      <div className="turf-caro-div">
-                        <div
-                          id="turf-carousel-indicators"
-                          className="carousel slide carousel-fade"
-                          data-bs-ride="carousel"
-                        >
-                          <div className="carousel-indicators">
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators"
-                              data-bs-slide-to="0"
-                              className="active"
-                              aria-current="true"
-                              aria-label="Slide 1"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators"
-                              data-bs-slide-to="1"
-                              aria-label="Slide 2"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators"
-                              data-bs-slide-to="2"
-                              aria-label="Slide 3"
-                            ></button>
-                          </div>
-                          <div className="carousel-inner">
-                            <h5 className="popular">Popular</h5>
-                            <div className="carousel-item active">
-                              <img
-                                src="assets/images/home/turfs/img2.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img3.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img1.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="main-details">
-                        <div className="turf-details-upper">
-                          <div className="col-lg-8">
-                            <h5>Sparta Arena</h5>
-                            <h6>Kakkanad, Kochi</h6>
-                          </div>
-                          <div className="col-lg-4 text-end">
-                            <img src="assets/images/home/turfs/rating.svg" />{" "}
-                            <span>48 (6.9)</span>
-                          </div>
-                        </div>
-                        <hr />
-                        <div className="turf-details-lower">
-                          <div className="col-lg-5 col-6 col-6">
-                            <ul>
-                              <li>
-                                {" "}
-                                <img src="assets/images/home/turfs/bat.svg" />
-                              </li>
-                              <li>
-                                <img src="assets/images/home/turfs/soccer-ball.svg" />
-                              </li>
-                              <li className="nos">+1</li>
-                            </ul>
-                          </div>
-                          <div className="col-lg-7 col-6 text-end">
-                            <ul>
-                              <li>7v7</li>
-                              <li>11v11</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-
-                <div className="col-lg-3">
-                  <a href="#">
-                    <div className="card">
-                      <div className="turf-caro-div">
-                        <div
-                          id="turf-carousel-indicators1"
-                          className="carousel slide carousel-fade"
-                          data-bs-ride="carousel"
-                        >
-                          <div className="carousel-indicators">
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators1"
-                              data-bs-slide-to="0"
-                              className="active"
-                              aria-current="true"
-                              aria-label="Slide 1"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators1"
-                              data-bs-slide-to="1"
-                              aria-label="Slide 2"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators1"
-                              data-bs-slide-to="2"
-                              aria-label="Slide 3"
-                            ></button>
-                          </div>
-                          <div className="carousel-inner">
-                            <div className="carousel-item active">
-                              <img
-                                src="assets/images/home/turfs/img3.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img1.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img2.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="main-details">
-                        <div className="turf-details-upper">
-                          <div className="col-lg-8">
-                            <h5>Sporthood Turfpark</h5>
-                            <h6>Vazhakkad, Kozhikode</h6>
-                          </div>
-                          <div className="col-lg-4 text-end">
-                            <img src="assets/images/home/turfs/rating.svg" />{" "}
-                            <span>48 (98)</span>
-                          </div>
-                        </div>
-                        <hr />
-                        <div className="turf-details-lower">
-                          <div className="col-lg-5 col-6">
-                            <ul>
-                              <li>
-                                {" "}
-                                <img src="assets/images/home/turfs/bat.svg" />
-                              </li>
-                              <li>
-                                <img src="assets/images/home/turfs/soccer-ball.svg" />
-                              </li>
-                              <li className="nos">+1</li>
-                            </ul>
-                          </div>
-                          <div className="col-lg-7 col-6 text-end">
-                            <ul>
-                              <li>7v7</li>
-                              <li>11v11</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-
-                <div className="col-lg-3">
-                  <a href="#">
-                    <div className="card">
-                      <div className="turf-caro-div">
-                        <div
-                          id="turf-carousel-indicators2"
-                          className="carousel slide carousel-fade"
-                          data-bs-ride="carousel"
-                        >
-                          <div className="carousel-indicators">
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators2"
-                              data-bs-slide-to="0"
-                              className="active"
-                              aria-current="true"
-                              aria-label="Slide 1"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators2"
-                              data-bs-slide-to="1"
-                              aria-label="Slide 2"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators2"
-                              data-bs-slide-to="2"
-                              aria-label="Slide 3"
-                            ></button>
-                          </div>
-                          <div className="carousel-inner">
-                            <h5 className="popular">Popular</h5>
-                            <div className="carousel-item active">
-                              <img
-                                src="assets/images/home/turfs/img1.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img2.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img3.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="main-details">
-                        <div className="turf-details-upper">
-                          <div className="col-lg-8">
-                            <h5>Gamma Football</h5>
-                            <h6>Shobha City Mall, Thrissur</h6>
-                          </div>
-                          <div className="col-lg-4 text-end">
-                            <img src="assets/images/home/turfs/rating.svg" />{" "}
-                            <span>48 (6.9)</span>
-                          </div>
-                        </div>
-                        <hr />
-                        <div className="turf-details-lower">
-                          <div className="col-lg-5 col-6">
-                            <ul>
-                              <li>
-                                {" "}
-                                <img src="assets/images/home/turfs/bat.svg" />
-                              </li>
-                              <li>
-                                <img src="assets/images/home/turfs/soccer-ball.svg" />
-                              </li>
-                              <li className="nos">+1</li>
-                            </ul>
-                          </div>
-                          <div className="col-lg-7 col-6 text-end">
-                            <ul>
-                              <li>7v7</li>
-                              <li>11v11</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-                <div className="col-lg-3">
-                  <a href="#">
-                    <div className="card">
-                      <div className="turf-caro-div">
-                        <div
-                          id="turf-carousel-indicators3"
-                          className="carousel slide carousel-fade"
-                          data-bs-ride="carousel"
-                        >
-                          <div className="carousel-indicators">
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators3"
-                              data-bs-slide-to="0"
-                              className="active"
-                              aria-current="true"
-                              aria-label="Slide 1"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators3"
-                              data-bs-slide-to="1"
-                              aria-label="Slide 2"
-                            ></button>
-                            <button
-                              type="button"
-                              data-bs-target="#turf-carousel-indicators3"
-                              data-bs-slide-to="2"
-                              aria-label="Slide 3"
-                            ></button>
-                          </div>
-                          <div className="carousel-inner">
-                            <h5 className="featured">Featured</h5>
-                            <div className="carousel-item active">
-                              <img
-                                src="assets/images/home/turfs/img2.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img3.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-
-                            <div className="carousel-item">
-                              <img
-                                src="assets/images/home/turfs/img1.png"
-                                className="d-block w-100"
-                                alt="..."
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="main-details">
-                        <div className="turf-details-upper">
-                          <div className="col-lg-8">
-                            <h5>Parkway</h5>
-                            <h6>Kolathara, Kozhikode</h6>
-                          </div>
-                          <div className="col-lg-4 text-end">
-                            <img src="assets/images/home/turfs/rating.svg" />{" "}
-                            <span>48 (6.9)</span>
-                          </div>
-                        </div>
-                        <hr />
-                        <div className="turf-details-lower">
-                          <div className="col-lg-5 col-6">
-                            <ul>
-                              <li>
-                                {" "}
-                                <img src="assets/images/home/turfs/bat.svg" />
-                              </li>
-                              <li>
-                                <img src="assets/images/home/turfs/soccer-ball.svg" />
-                              </li>
-                              <li className="nos">+1</li>
-                            </ul>
-                          </div>
-                          <div className="col-lg-7 col-6 text-end">
-                            <ul>
-                              <li>7v7</li>
-                              <li>11v11</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <p>No data available</p>
+                )}
               </div>
             </div>
           </div>

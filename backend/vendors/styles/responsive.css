@@ -1,0 +1,205 @@
+
+@media only screen and (min-width: 300px) and (max-width: 768px) {
+.container-pad {
+    padding: 0 20px;
+}
+.form-head h3 {
+    font-size: 28px;
+}
+.login-section {
+    background: url(../img/mobile-login-bg.png);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+.page-header h4 {
+    font-size: 16px;
+}
+.btn {
+    padding: 0.4rem 0.2rem;
+    font-size: 13px;
+}
+.login-box {
+    margin: 70px auto 86px auto;
+}
+.l-logo {
+    position: relative;
+    text-align: center;
+}
+.left-side-bar .close-sidebar {
+    top: 14px;
+}
+.left-side-bar .close-sidebar {
+    font-size: 16px;
+}
+.sidebar-shrink .brand-logo {
+    width: 5.5rem;
+}
+.form-logo {
+    width: 75px;
+}
+.step-head {
+    font-size: 14px;
+}
+.wizard-content .wizard>.content>.body {
+    padding: 0 20px;
+}
+.wizard-content .wizard>.content {
+    height: auto;
+}
+.wizard-content {
+    height: auto;
+}
+.back-btn {
+    position: relative;
+    margin-top: 0;
+    padding-left: 30px;
+    text-align: center;
+    padding-bottom: 20px;
+}
+.wizard-content .wizard>.actions {
+    padding: 20px 20px 20px;
+}
+.grey-badge {
+    line-height: 45px;
+    padding: 8px 30px 8px 30px;
+}
+.grey-badge.active .active-tick {
+    margin-top: 16px;
+    margin-right: 8px;
+}
+.pad-var .grey-badge {
+    padding: 8px 14px 8px 14px;
+}
+.pad-var .grey-badge img{
+    margin-top: 10px;
+}
+.sports-list ul {
+    display: block;
+}
+.sports-list ul li{
+    display: inline-block;
+    margin-bottom: 10px;
+}
+.ammenities-list .option_item .option_inner {
+    padding: 10px 10px 10px 30px;
+}
+.option_item .option_inner .name {
+    font-size: 12px;
+}
+.form-input::after {
+    height: 11px;
+    width: 14px;
+}
+.form-row {
+    padding: 8px 20px 8px 28px;
+}
+.feature-box {
+    padding: 12px 8px 12px 8px;
+    margin-right: 6px;
+    width: 90px;
+}
+.form-group > label {
+    font-size: 13px;
+}
+.images-upload .form-group > label {
+    font-size: 12px;
+}
+.white-btn {
+    padding: 0.4rem 1rem;
+    width: auto;
+}
+.step-text {
+    margin-bottom: 4px;
+}
+.sidebar-shrink .sidebar-menu {
+    padding: 0;
+}
+}
+/* Portrait */
+@media only screen 
+and (min-width: 768px) 
+and (max-height: 1024px) 
+and (orientation: portrait) 
+and (-webkit-min-device-pixel-ratio: 1.5) {
+.sidebar-shrink .sidebar-menu {
+    padding: 0;
+}
+.pad-var .grey-badge {
+    padding: 8px 12px 8px 12px;
+}
+.images-upload .form-group > label {
+    font-size: 14px;
+}
+.white-btn {
+    padding: 0.6rem 2rem;
+}
+.back-btn {
+    position: absolute;
+    margin-top: -80px;
+    padding-left: 30px;
+}
+/* .form-section {
+    height: 100vh;
+} */
+}
+/* landscape */
+@media only screen 
+and (min-width: 1024px) 
+and (max-height: 768px) 
+and (orientation: landscape) 
+and (-webkit-min-device-pixel-ratio: 1.5) {
+.left-side-bar .close-sidebar {
+    top: 14px;
+}
+.sidebar-shrink .sidebar-menu {
+    padding: 0rem 0rem 0rem 0rem;
+}
+}
+/* Portrait */
+@media only screen 
+and (min-width: 820px) 
+and (max-height: 1180px) 
+and (orientation: portrait) 
+and (-webkit-min-device-pixel-ratio: 1.5) {
+.login-section {
+    background: url(../img/mobile-login-bg.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+ }
+ /* .form-section {
+    height: 100vh;
+} */
+}
+@media only screen 
+and (min-width: 1180px) 
+and (max-height: 820px) 
+and (orientation: landscape) 
+and (-webkit-min-device-pixel-ratio: 1.5) {
+ 
+}
+/* landscape */
+@media only screen and (min-width: 1024px) and (max-height: 768px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 1.5) {
+.login-section {
+    background-size: cover;
+}
+.form-head h3 {
+    font-size: 28px;
+}
+}
+
+@media only screen and (min-width: 1430px) and (max-width: 1450px) {
+.login-section {
+    background-size: cover;
+}
+.ammenities-list .option_item .option_inner {
+    padding: 10px 22px 10px 28px;
+}
+/* .form-section {
+    height: 100vh;
+} */
+}
+@media only screen and (min-width: 1910px) and (max-width: 1930px) {
+ /* .form-section {
+  height: 100vh;
+ } */
+}
