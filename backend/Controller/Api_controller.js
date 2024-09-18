@@ -370,7 +370,16 @@ module.exports.getnearbyturf = async (req, res) => {
 /**** get latest turf ******/
 module.exports.getleastturf = async (req, res) => {
   const getLeastTurflist = await db.query(
-    "select * from turfs as t where t.deleted_at is null order by t.id desc limit 8"
+    `SELECT t.id, t.turf_name,t.turf_no,t.city, t.amenities,t.sports,t.players,COALESCE(rx.Averageratings, 0) as AverageRating,
+                  COALESCE(rx.RatingCount, 0) as RatingCount FROM turfs t LEFT JOIN
+                  (SELECT
+                      r.turf_id,
+                      AVG(r.rating) AS Averageratings,
+                      COUNT(r.rating) AS RatingCount
+                  FROM
+                      reviews r
+                  GROUP BY
+                      r.turf_id) rx ON rx.turf_id = t.id ORDER BY t.id  DESC LIMIT 8`
   );
 
   if (getLeastTurflist.rowCount > 0) {
@@ -382,10 +391,21 @@ module.exports.getleastturf = async (req, res) => {
 
         const amenities_query = `select id,amenity_icon,amenity_name from amenities where id = ANY($1::int[])`;
         const amenities_parameter = [amenities_data];
-        element.amenities = await db.query(
+        const { rows: GetAmenties } = await db.query(
           amenities_query,
           amenities_parameter
         );
+
+        const infoGetAmenties = GetAmenties.map((info) => ({
+          ...info,
+          amenity_icon: `${process.env.LOCAL_PATH}/${info.amenity_icon}`,
+        }));
+
+        if (GetAmenties.length > 0) {
+          element.amenities = infoGetAmenties;
+        } else {
+          element.amenities = null;
+        }
       }
 
       if (element.sports !== null && element.sports !== "") {
@@ -394,7 +414,18 @@ module.exports.getleastturf = async (req, res) => {
         const query = `select id,sport_icon,sport_name from sports where id = ANY($1::int[])`;
         const values = [sportids];
 
-        element.sports = await db.query(query, values);
+        const { rows: ListGetSpt } = await db.query(query, values);
+
+        const getListGetSpt = ListGetSpt.map((item) => ({
+          ...item,
+          sport_icon: `${process.env.LOCAL_PATH}/${item.sport_icon}`,
+        }));
+
+        if (ListGetSpt.length > 0) {
+          element.sports = getListGetSpt;
+        } else {
+          element.sports = null;
+        }
       }
 
       if (element.players !== null && element.players !== "") {
@@ -408,18 +439,21 @@ module.exports.getleastturf = async (req, res) => {
       const turfmediaquery = `select tm.media_path,mt.media_name from turf_media as tm
       left join media_types as mt on tm.media_type = mt.id where tm.turf_id = $1`;
       const turfvalue = [element.id];
-      const turf_media = await db.query(turfmediaquery, turfvalue);
+      const { rows: turf_media } = await db.query(turfmediaquery, turfvalue);
+      const getturf_media = turf_media.map((turfInfo) => ({
+        ...turfInfo,
+        media_path: `${process.env.LOCAL_PATH}/${turfInfo.media_path}`,
+      }));
 
-      if (turf_media.rowCount > 0) {
-        element.media = turf_media.rows;
+      if (turf_media.length > 0) {
+        element.media = getturf_media;
       } else {
         element.media = null;
       }
 
       element.media = element.media ? element.media : null;
-      element.amenities =
-        element.amenities.rowCount > 0 ? element.amenities.rows : null;
-      element.sports = element.sports.rowCount > 0 ? element.sports.rows : null;
+      element.amenities = element.amenities ? element.amenities : null;
+      element.sports = element.sports ? element.sports : null;
       element.players = element.players ? element.players : null;
 
       return element;
@@ -433,7 +467,7 @@ module.exports.getleastturf = async (req, res) => {
 
 /**** get Top turf */
 module.exports.getTopTurf = async (req, res) => {
-  const getQuery = `SELECT t.id, t.turf_name,t.turf_no, t.amenities,t.sports,t.players,COALESCE(rx.Averageratings, 0) as AverageRating,
+  const getQuery = `SELECT t.id, t.turf_name,t.turf_no,t.city, t.amenities,t.sports,t.players,COALESCE(rx.Averageratings, 0) as AverageRating,
                   COALESCE(rx.RatingCount, 0) as RatingCount FROM turfs t LEFT JOIN
                   (SELECT
                       r.turf_id,
@@ -454,7 +488,21 @@ module.exports.getTopTurf = async (req, res) => {
         });
         const amenitiesData = [amenitiesArrray];
         const amenitiesQuery = `select amenity_name,front_icon from amenities where id = ANY($1::int[])`;
-        element.amenities = await db.query(amenitiesQuery, amenitiesData);
+        const { rows: listingAmenities } = await db.query(
+          amenitiesQuery,
+          amenitiesData
+        );
+
+        const getAmentiesInfo = listingAmenities.map((info) => ({
+          ...info,
+          front_icon: `${process.env.LOCAL_PATH}/${info.front_icon}`,
+        }));
+
+        if (listingAmenities.length > 0) {
+          element.amenities = getAmentiesInfo;
+        } else {
+          element.amenities = null;
+        }
       }
 
       if (element.sports !== null || element.sports !== "") {
@@ -463,7 +511,18 @@ module.exports.getTopTurf = async (req, res) => {
         });
         const sportsData = [sportsArrray];
         const sportsQuery = `select sport_name,front_icon from sports where id = ANY($1::int[])`;
-        element.sports = await db.query(sportsQuery, sportsData);
+        const { rows: getSportInfo } = await db.query(sportsQuery, sportsData);
+
+        const listGetSportInfo = getSportInfo.map((sport) => ({
+          ...sport,
+          front_icon: `${process.env.LOCAL_PATH}/${sport.front_icon}`,
+        }));
+
+        if (getSportInfo.length > 0) {
+          element.sports = listGetSportInfo;
+        } else {
+          element.sports = null;
+        }
       }
 
       if (element.players !== null || element.players !== "") {
@@ -485,9 +544,8 @@ module.exports.getTopTurf = async (req, res) => {
         element.media = null;
       }
 
-      element.amenities =
-        element.amenities.rowCount > 0 ? element.amenities.rows : null;
-      element.sports = element.sports.rowCount > 0 ? element.sports.rows : null;
+      element.amenities = element.amenities ? element.amenities : null;
+      element.sports = element.sports;
       element.players = element.players ? element.players : null;
       element.media = element.media ? element.media : null;
 
