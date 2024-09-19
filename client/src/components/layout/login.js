@@ -37,7 +37,7 @@ const Login = () => {
         "http://localhost:4000/api/register",
         getRegisterData,
         {
-          header: {
+          headers: {
             "Content-Type": "application/json",
           },
         }

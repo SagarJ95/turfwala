@@ -21,8 +21,6 @@ const Home = () => {
         e.response != undefined ? toastr.error(e.response.data.error) : "";
     }
   };
-  // Use useEffect to call the API only once when the component mounts
-
   //get Top turf
   const [TopTurf, SetTopTurf] = useState([]);
   const getTopTurf = async () => {
@@ -265,7 +263,10 @@ const Home = () => {
                     {data.map((item) => {
                       return (
                         <div className="col-lg-3">
-                          <Link to={`/turf_details/${item.turf_no}`}>
+                          <Link
+                            to={`/turf_details/${item.turf_no}`}
+                            state={{ turf: item.turf_no }} // Pass state directly
+                          >
                             <div className="card">
                               <div className="turf-caro-div">
                                 <div

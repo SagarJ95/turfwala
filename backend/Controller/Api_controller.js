@@ -563,7 +563,9 @@ module.exports.getTurfInfoDetails = async (req, res) => {
   try {
     const { id } = req.body;
 
-    const Turfs = await db.query("select * from turfs where id = $1", [id]);
+    const Turfs = await db.query("select * from turfs where turf_no = $1", [
+      id,
+    ]);
 
     if (Turfs.rowCount == 0) {
       res.status(403).json({
@@ -576,11 +578,19 @@ module.exports.getTurfInfoDetails = async (req, res) => {
           return id.trim();
         });
 
-        const amenitiesQUery = `select * from amenities where id = ANY($1::int[])`;
-        const AmentitesRecords = await db.query(amenitiesQUery, [amenitiesId]);
+        const amenitiesQUery = `select amenity_icon,amenity_name from amenities where id = ANY($1::int[])`;
+        const { rows: AmentitesRecords } = await db.query(amenitiesQUery, [
+          amenitiesId,
+        ]);
 
-        if (AmentitesRecords.rowCount > 0) {
-          Turfs.rows[0].amenities = AmentitesRecords.rows;
+        const getAmentitesRecords = AmentitesRecords.map(
+          (AmentitesRecords) => ({
+            ...AmentitesRecords,
+            amenity_icon: `${process.env.LOCAL_PATH}/${AmentitesRecords.amenity_icon}`,
+          })
+        );
+        if (AmentitesRecords.length > 0) {
+          Turfs.rows[0].amenities = getAmentitesRecords;
         } else {
           Turfs.rows[0].amenities = null;
         }
@@ -590,11 +600,16 @@ module.exports.getTurfInfoDetails = async (req, res) => {
         const sportsId = Turfs.rows[0].sports.split(",").map((id) => {
           return id.trim();
         });
-        const sportsQUery = `select * from sports where id = ANY($1::int[])`;
-        const sportsDetalis = await db.query(sportsQUery, [sportsId]);
+        const sportsQUery = `select front_icon,sport_name from sports where id = ANY($1::int[])`;
+        const { rows: sportsDetalis } = await db.query(sportsQUery, [sportsId]);
 
-        if (sportsDetalis.rowCount > 0) {
-          Turfs.rows[0].sports = sportsDetalis.rows;
+        const getSportDetails = sportsDetalis.map((sportsDetalis) => ({
+          ...sportsDetalis,
+          front_icon: `${process.env.LOCAL_PATH}/${sportsDetalis.front_icon}`,
+        }));
+
+        if (sportsDetalis.length > 0) {
+          Turfs.rows[0].sports = getSportDetails;
         } else {
           Turfs.rows[0].sports = null;
         }
@@ -611,12 +626,41 @@ module.exports.getTurfInfoDetails = async (req, res) => {
       const turfmediaQuery = `select tm.media_path,mt.media_name from turf_media as tm
       left join media_types as mt on tm.media_type = mt.id where tm.turf_id = $1`;
       const turfValue = [Turfs.rows[0].id];
-      const Turf_Media = await db.query(turfmediaQuery, turfValue);
+      const { rows: Turf_Media } = await db.query(turfmediaQuery, turfValue);
 
-      if (Turf_Media.rowCount > 0) {
-        Turfs.rows[0].media = Turf_Media.rows;
+      const getTurfMedia = Turf_Media.map((Turf_Media) => ({
+        ...Turf_Media,
+        media_path: `${process.env.LOCAL_PATH}/${Turf_Media.media_path}`,
+      }));
+
+      if (Turf_Media.length > 0) {
+        Turfs.rows[0].media = getTurfMedia;
       } else {
         Turfs.rows[0].media = null;
+      }
+
+      const similar_turf = `SELECT
+                  t.id,
+                  t.turf_no,
+                  t.turf_name,
+                  t.city,
+                  t.pincode,
+                  STRING_AGG(s.sport_name, ', ') AS sports_played
+              FROM
+                  turfs t
+              LEFT JOIN
+                  sports s ON s.id = ANY(STRING_TO_ARRAY(t.sports, ',')::int[])
+              WHERE
+                   t.id != $1
+              GROUP BY
+                  t.id, t.turf_no, t.turf_name, t.city, t.pincode order by t.id desc limit 2`;
+      const similarValue = [Turfs.rows[0].id];
+      const similarTrufValue = await db.query(similar_turf, similarValue);
+
+      if (similarTrufValue.rowCount > 0) {
+        Turfs.rows[0].similarTurf = similarTrufValue.rows;
+      } else {
+        Turfs.rows[0].similarTurf = getTurfMedia;
       }
 
       res.status(200).json({ success: true, result: Turfs.rows[0] });

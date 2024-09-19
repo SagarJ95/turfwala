@@ -1,6 +1,42 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
+import { useLocation, Link } from "react-router-dom";
 import OwlCarousel from "react-owl-carousel";
-const trufDetails = () => {
+import toastr from "toastr";
+import "toastr/build/toastr.min.css";
+import axios from "axios";
+
+const TrufDetails = () => {
+  const location = useLocation();
+  const { state } = location;
+  const truf_id = state.turf;
+  const [trufInformation, SetTrufInfo] = useState([]);
+
+  const trufInfo = async () => {
+    const PassID = {
+      id: truf_id,
+    };
+    console.log("passOD", PassID);
+    const getReposne = await axios.post(
+      "http://localhost:4000/api/getTurfInfo",
+      PassID,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (getReposne.status === 200) {
+      SetTrufInfo(getReposne.data.result);
+    } else {
+      toastr.error("Error");
+    }
+  };
+
+  useEffect(() => {
+    trufInfo();
+  }, []);
+  console.log("trufInformation>>", trufInformation);
   return (
     <>
       <Fragment>
@@ -73,7 +109,7 @@ const trufDetails = () => {
                   <li className="p5">/</li>
                   <li>Listing</li>
                   <li className="p5">/</li>
-                  <li>Sparta Arena</li>
+                  <li>{trufInformation.turf_name}</li>
                 </ul>
               </div>
             </div>
@@ -81,18 +117,19 @@ const trufDetails = () => {
             <div className="row">
               <div className="col-lg-7">
                 <h4>
-                  Sparta Arena <span>Open</span>
+                  {trufInformation.turf_name} <span>Open</span>
                 </h4>
                 <ul className="address">
                   <li>
                     <img src="assets/images/turf-details/Location.svg" />
-                    Waghale State, Thane, 400615
+                    {trufInformation.address} , {trufInformation.city},{" "}
+                    {trufInformation.pincode}
                   </li>
                   <li>
-                    <a href="tel:+91 80992 31212">
+                    <Link to={`tel:+91 ${trufInformation.contact_no_1}}`}>
                       <img src="assets/images/turf-details/Call.svg" /> +91
-                      80992 31212
-                    </a>
+                      {trufInformation.contact_no_1}
+                    </Link>
                   </li>
                   <li>
                     <a href="mailto:spartaarena@mail.com">
@@ -122,66 +159,21 @@ const trufDetails = () => {
               <div className="col-lg-12">
                 <div className="owl-slider">
                   <OwlCarousel margin={3} className="owl-theme" autoplay={true}>
-                    <div className="item">
-                      <img
-                        src="assets/images/turf-details/gallery-02.png"
-                        alt="image"
-                      />
-                    </div>
-                    <div className="item">
-                      <img
-                        src="assets/images/turf-details/gallery-03.png"
-                        alt=""
-                      />
-                    </div>
-                    <div className="item">
-                      <img
-                        src="assets/images/turf-details/gallery-04.png"
-                        alt=""
-                      />
-                    </div>
-                    <div className="item">
-                      <img
-                        src="assets/images/turf-details/gallery-05.png"
-                        alt=""
-                      />
-                    </div>
-                    <div className="item">
-                      <img
-                        src="assets/images/turf-details/gallery-02.png"
-                        alt=""
-                      />
-                    </div>
-                    <div className="item">
-                      <img
-                        src="assets/images/turf-details/gallery-03.png"
-                        alt=""
-                      />
-                    </div>
-                    <div className="item">
-                      <img
-                        src="assets/images/turf-details/gallery-04.png"
-                        alt=""
-                      />
-                    </div>
-                    <div className="item">
-                      <img
-                        src="assets/images/turf-details/gallery-05.png"
-                        alt=""
-                      />
-                    </div>
-                    <div className="item">
-                      <img
-                        src="assets/images/turf-details/gallery-02.png"
-                        alt=""
-                      />
-                    </div>
-                    <div className="item">
-                      <img
-                        src="assets/images/turf-details/gallery-03.png"
-                        alt=""
-                      />
-                    </div>
+                    {trufInformation.media &&
+                    trufInformation.media.length > 0 ? (
+                      trufInformation.media.map((item, index) => {
+                        <div className="item">
+                          <img src={item.media_path} alt="image" />
+                        </div>;
+                      })
+                    ) : (
+                      <div className="item">
+                        <img
+                          src="assets/images/turf-details/gallery-02.png"
+                          alt="image"
+                        />
+                      </div>
+                    )}
                   </OwlCarousel>
                 </div>
               </div>
@@ -197,7 +189,7 @@ const trufDetails = () => {
             <div className="row">
               <div className="col-lg-8">
                 <div className="accordion" id="list-view-accord">
-                  <div className="accordion-item">
+                  {/* <div className="accordion-item">
                     <h2 className="accordion-header" id="headingOne">
                       <button
                         className="accordion-button"
@@ -223,7 +215,7 @@ const trufDetails = () => {
                         equipment to support athletes in their training.
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                   <div className="accordion-item">
                     <h2 className="accordion-header" id="headingTwo">
                       <button
@@ -245,26 +237,19 @@ const trufDetails = () => {
                     >
                       <div className="accordion-body">
                         <ul className="diff-sports">
-                          <li>
-                            <img src="assets/images/turf-details/sports-played/shuttle-cock.svg" />{" "}
-                            Badminton{" "}
-                          </li>
-                          <li>
-                            <img src="assets/images/turf-details/sports-played/bat.svg" />{" "}
-                            Cricket{" "}
-                          </li>
-                          <li>
-                            <img src="assets/images/turf-details/sports-played/soccer-ball.svg" />{" "}
-                            Soccer Ball{" "}
-                          </li>
-                          <li>
-                            <img src="assets/images/turf-details/sports-played/volley-ball.svg" />{" "}
-                            Volley Ball{" "}
-                          </li>
-                          <li>
-                            <img src="assets/images/turf-details/sports-played/tennis-balls.svg" />{" "}
-                            Tennis Ball{" "}
-                          </li>
+                          {trufInformation.sports &&
+                          trufInformation.sports.length > 0 ? (
+                            trufInformation.sports.map((item, index) => (
+                              <li>
+                                <img src={item.front_icon} /> {item.sport_name}{" "}
+                              </li>
+                            ))
+                          ) : (
+                            <li>
+                              <img src="assets/images/turf-details/sports-played/shuttle-cock.svg" />{" "}
+                              Badminton{" "}
+                            </li>
+                          )}
                         </ul>
                       </div>
                     </div>
@@ -290,34 +275,20 @@ const trufDetails = () => {
                     >
                       <div className="accordion-body">
                         <div className="row">
-                          <div className="col-lg-3 col-6">
-                            <img src="assets/images/turf-details/amenities/clothes-hanger.svg" />{" "}
-                            Changing Room
-                          </div>
-                          <div className="col-lg-3 col-6">
-                            <img src="assets/images/turf-details/amenities/toilet.svg" />{" "}
-                            Washroom
-                          </div>
-                          <div className="col-lg-3 col-6">
-                            <img src="assets/images/turf-details/amenities/plastic-bottle.svg" />{" "}
-                            Water Bottle
-                          </div>
-                          <div className="col-lg-3 col-6">
-                            <img src="assets/images/turf-details/amenities/pipes.svg" />{" "}
-                            Aqua Guard
-                          </div>
-                          <div className="col-lg-3 col-6">
-                            <img src="assets/images/turf-details/amenities/tennis-balls.svg" />{" "}
-                            Cricket Balls
-                          </div>
-                          <div className="col-lg-3 col-6">
-                            <img src="assets/images/turf-details/amenities/bat.svg" />{" "}
-                            Extra Bat
-                          </div>
-                          <div className="col-lg-3 col-6">
-                            <img src="assets/images/turf-details/amenities/seats.svg" />{" "}
-                            Sitting Area
-                          </div>
+                          {trufInformation.amenities &&
+                          trufInformation.amenities.length > 0 ? (
+                            trufInformation.amenities.map((item, index) => (
+                              <div className="col-lg-3 col-6">
+                                <img src={item.amenity_icon} />{" "}
+                                {item.amenity_name}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="col-lg-3 col-6">
+                              <img src="assets/images/turf-details/amenities/clothes-hanger.svg" />{" "}
+                              Changing Room
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -357,8 +328,8 @@ const trufDetails = () => {
                               <img src="assets/images/turf-details/map-pin.svg" />
                             </div>
                             <div className="col-lg-9 offset-lg-1 col-9">
-                              <h5>Our Venue Location</h5>
-                              <p>70 Bright Kakkanad, Kochi</p>
+                              <h5>{trufInformation.turf_name}</h5>
+                              <p>{trufInformation.address}</p>
                             </div>
                           </div>
                         </div>
@@ -641,11 +612,12 @@ const trufDetails = () => {
               </div>
 
               <div className="col-lg-4">
-                <div className="check-availibility-div">
+                {/* <div className="check-availibility-div">
                   <h4>Check Availability</h4>
                   <div className="outer-padding">
                     <h5>
-                      Sparta Arena <span>(Available for booking)</span>
+                      {trufInformation.turf_name}{" "}
+                      <span>(Available for booking)</span>
                     </h5>
                     <div className="gallery-text">
                       <a href="#" className="price-chart">
@@ -657,22 +629,32 @@ const trufDetails = () => {
                       Check Availability
                     </a>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="row">
                   <div className="col-lg-6">
                     <div className="size">
                       <h4>Size of Turf</h4>
-                      <h5>5,000 sq feet</h5>
+                      <h5>
+                        {trufInformation.turf_size
+                          ? trufInformation.turf_size
+                          : 0}{" "}
+                        sq feet
+                      </h5>
                     </div>
                   </div>
                   <div className="col-lg-6 pl-0">
                     <div className="play-capacity">
                       <h4>Player capacity</h4>
                       <ul>
-                        <li>5x5</li>
-                        <li>7x7</li>
-                        <li>11x11</li>
+                        {trufInformation.players &&
+                        trufInformation.players.length > 0 ? (
+                          trufInformation.players.map((player, index) => {
+                            <li>{player}</li>;
+                          })
+                        ) : (
+                          <li>da</li>
+                        )}
                       </ul>
                     </div>
                   </div>
@@ -715,54 +697,62 @@ const trufDetails = () => {
                 <div className="similar-turf-div">
                   <h4>Nearby Turfs</h4>
                   <div className="outer-padding">
-                    <div className="row">
-                      <div className="col-lg-4 col-4 pr-0">
-                        <img
-                          src="assets/images/turf-details/listing-by-owner-02.jpg"
-                          className="img-fluid"
-                        />
+                    {trufInformation.similarTurf &&
+                    trufInformation.similarTurf.length > 0 ? (
+                      trufInformation.similarTurf.map((similarTurf, index) => {
+                        return (
+                          <div className="row">
+                            <div className="col-lg-4 col-4 pr-0">
+                              <img
+                                src="assets/images/turf-details/listing-by-owner-02.jpg"
+                                className="img-fluid"
+                              />
+                            </div>
+                            <div className="col-lg-8 col-8 bod-pad">
+                              <h5>{similarTurf.turf_name}</h5>
+                              <ul>
+                                <li>
+                                  <img src="assets/images/turf-details/Location.svg" />{" "}
+                                  {similarTurf.city}, {similarTurf.pincode}
+                                </li>
+                                <li>
+                                  <img src="assets/images/turf-details/Calendar.svg" />{" "}
+                                  Sports Played{" "}
+                                  <span>{similarTurf.sports_played}</span>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="row">
+                        <div className="col-lg-4 col-4 pr-0">
+                          <img
+                            src="assets/images/turf-details/listing-by-owner-02.jpg"
+                            className="img-fluid"
+                          />
+                        </div>
+                        <div className="col-lg-8 col-8 bod-pad">
+                          <h5>Manchester Academy</h5>
+                          <ul>
+                            <li>
+                              <img src="assets/images/turf-details/Location.svg" />{" "}
+                              Waghbil, Thane
+                            </li>
+                            <li>
+                              <img src="assets/images/turf-details/Calendar.svg" />{" "}
+                              Sports Played{" "}
+                              <span>Basketball, Baseball, Tennis, Volly</span>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
-                      <div className="col-lg-8 col-8 bod-pad">
-                        <h5>Manchester Academy</h5>
-                        <ul>
-                          <li>
-                            <img src="assets/images/turf-details/Location.svg" />{" "}
-                            Waghbil, Thane
-                          </li>
-                          <li>
-                            <img src="assets/images/turf-details/Calendar.svg" />{" "}
-                            Sports Played{" "}
-                            <span>Basketball, Baseball, Tennis, Volly</span>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div className="row pt-10">
-                      <div className="col-lg-4 col-4 pr-0">
-                        <img
-                          src="assets/images/turf-details/listing-by-owner-01.jpg"
-                          className="img-fluid"
-                        />
-                      </div>
-                      <div className="col-lg-8 col-8 bod-pad">
-                        <h5>Sarah Sports Academy</h5>
-                        <ul>
-                          <li>
-                            <img src="assets/images/turf-details/Location.svg" />{" "}
-                            Taloja, Panvel
-                          </li>
-                          <li>
-                            <img src="assets/images/turf-details/Calendar.svg" />{" "}
-                            Sports Played{" "}
-                            <span>Cricket, Football, Tennis, Volly</span>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="social-share">
+                {/* <div className="social-share">
                   <h4>Share</h4>
                   <div className="outer-padding">
                     <ul>
@@ -778,7 +768,7 @@ const trufDetails = () => {
                       </li>
                     </ul>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -905,4 +895,4 @@ const trufDetails = () => {
   );
 };
 
-export default trufDetails;
+export default TrufDetails;
